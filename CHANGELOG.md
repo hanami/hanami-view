@@ -2,7 +2,7 @@
 
 View layer for Hanami
 
-## v2.3.0.beta1 - Unreleased
+## v2.3.0.beta1 - 2025-10-03
 
 ## v2.2.1 - 2025-03-17
 
