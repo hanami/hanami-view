@@ -32,6 +32,7 @@ module Hanami
           "#{root}/hanami-view.rb",
           "#{root}/hanami/view/version.rb",
           "#{root}/hanami/view/errors.rb",
+          "#{root}/hanami/view/tilt/*.rb"
         )
         loader.inflector = Zeitwerk::GemInflector.new("#{root}/hanami-view.rb")
         loader.inflector.inflect(
