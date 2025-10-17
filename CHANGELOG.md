@@ -2,6 +2,12 @@
 
 View layer for Hanami
 
+## v2.3.0.beta2 - 2025-10-17
+
+### Changed
+
+- Drop support for Ruby 3.1
+
 ## v2.3.0.beta1 - 2025-10-03
 
 ## v2.2.1 - 2025-03-17
