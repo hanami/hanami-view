@@ -19,12 +19,8 @@ jobs:
           - "3.4"
           - "3.3"
           - "3.2"
-        include:
-          - ruby: "3.4"
-            coverage: "true"
     env:
       CLASSPATH: "" # tmp jruby build workaround
-      COVERAGE: ${{matrix.coverage}}
     steps:
       - uses: actions/checkout@v3
       - name: Set up Ruby

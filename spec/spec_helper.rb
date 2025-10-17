@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "support/coverage"
-
 begin
   require "pry-byebug"
 rescue LoadError; end
