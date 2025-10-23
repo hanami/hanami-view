@@ -6,8 +6,6 @@ A view layer for [Hanami](http://hanamirb.org)
 
 [![Gem Version](https://badge.fury.io/rb/hanami-view.svg)](https://badge.fury.io/rb/hanami-view)
 [![CI](https://github.com/hanami/view/actions/workflows/ci.yml/badge.svg)](https://github.com/hanami/view/actions?query=workflow%3Aci+branch%3Amain)
-[![Test Coverage](https://codecov.io/gh/hanami/view/branch/main/graph/badge.svg)](https://codecov.io/gh/hanami/view)
-[![Depfu](https://badges.depfu.com/badges/7cd17419fba78b726be1353118fb01de/overview.svg)](https://depfu.com/github/hanami/view?project=Bundler)
 
 ## Contact
 
@@ -19,8 +17,6 @@ A view layer for [Hanami](http://hanamirb.org)
 * Chat: http://chat.hanamirb.org
 
 ## Rubies
-
-__Hanami::View__ supports Ruby (MRI) 3.1+
 
 ## Installation
 
