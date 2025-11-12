@@ -4,6 +4,10 @@ View layer for Hanami
 
 ## v2.3.0 - 2025-11-12
 
+### Fixed
+
+- Avoid warnings (from deprecated `URI::RFC3986_PARSER.extract`) in escape helper. (@timriley in #267)
+
 ## v2.3.0.beta2 - 2025-10-17
 
 ### Changed
