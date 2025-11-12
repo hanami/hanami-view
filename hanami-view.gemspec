@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "A complete, standalone view rendering system that gives you everything you need to write well-factored view code"
   spec.description   = spec.summary
-  spec.homepage      = 'https://dry-rb.org/gems/hanami-view'
+  spec.homepage      = 'https://hanamirb.org'
   spec.files         = Dir["CHANGELOG.md", "LICENSE", "README.md", "hanami-view.gemspec", "lib/**/*"]
   spec.bindir        = 'bin'
   spec.executables   = []
