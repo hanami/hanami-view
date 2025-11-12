@@ -6,8 +6,8 @@ require 'hanami/view/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'hanami-view'
-  spec.authors       = ["Tim Riley", "Piotr Solnica"]
-  spec.email         = ["tim@icelab.com.au", "piotr.solnica@gmail.com"]
+  spec.authors       = ["Hanakai team"]
+  spec.email         = ["info@hanakai.org"]
   spec.license       = 'MIT'
   spec.version       = Hanami::View::VERSION.dup
 
