@@ -120,11 +120,18 @@ module Hanami
         def sanitize_url(input, permitted_schemes = PERMITTED_URL_SCHEMES)
           return input if input.html_safe?
 
-          URI::DEFAULT_PARSER.extract(
+          URI_PARSER.extract(
             URI.decode_www_form_component(input.to_s),
             permitted_schemes
           ).first.to_s.html_safe
         end
+
+        # Use the RFC2396_PARSER if available. Modern Rubies should have RFC2396_PARSER available.
+        # Otherwise, fall back to the DEFAULT_PARSER (which may still raise deprecation warnings).
+        #
+        # @api private
+        URI_PARSER = URI.const_defined?(:RFC2396_PARSER) ? URI::RFC2396_PARSER : URI::DEFAULT_PARSER
+        private_constant :URI_PARSER
 
         # @api private
         # @since 2.1.0
