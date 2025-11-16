@@ -275,6 +275,23 @@ RSpec.describe "exposures" do
     )
   end
 
+  it "passes all input data as keyword arguments if a splat is provided" do
+    view = Class.new(Hanami::View) do
+      config.paths = SPEC_ROOT.join("fixtures/templates")
+      config.layout = "app"
+      config.template = "greeting"
+      config.default_format = :html
+
+      expose :greeting do |**kwargs|
+        "#{kwargs[:prefix]} #{kwargs[:name]} (length #{kwargs.length})"
+      end
+    end.new
+
+    expect(view.(prefix: "Mx.", name: "Keywords", context: context).to_s).to eql(
+      "<!DOCTYPE html><html><head><title>hanami-view rocks!</title></head><body><p>Mx. Keywords (length 2)</p></body></html>"
+    )
+  end
+
   it "supports defining multiple exposures at once" do
     view = Class.new(Hanami::View) do
       config.paths = SPEC_ROOT.join("fixtures/templates")

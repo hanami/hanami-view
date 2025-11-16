@@ -147,9 +147,13 @@ module Hanami
       end
 
       def proc_input_args(input)
-        input_keys.each_with_object({}) { |key, args|
-          args[key] = input[key] if input.key?(key)
-        }
+        if proc.parameters.any? { |(type, _name)| type == :keyrest }
+          input.except(:context)
+        else
+          input_keys.each_with_object({}) { |key, args|
+            args[key] = input[key] if input.key?(key)
+          }
+        end
       end
 
       def prepare_proc(proc, object)
