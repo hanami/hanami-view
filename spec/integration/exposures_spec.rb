@@ -283,12 +283,30 @@ RSpec.describe "exposures" do
       config.default_format = :html
 
       expose :greeting do |**kwargs|
-        "#{kwargs[:prefix]} #{kwargs[:name]} (length #{kwargs.length})"
+        "#{kwargs[:prefix]} #{kwargs[:name]} (length: #{kwargs.length})"
       end
     end.new
 
     expect(view.(prefix: "Mx.", name: "Keywords", context: context).to_s).to eql(
-      "<!DOCTYPE html><html><head><title>hanami-view rocks!</title></head><body><p>Mx. Keywords (length 2)</p></body></html>"
+      "<!DOCTYPE html><html><head><title>hanami-view rocks!</title></head><body><p>Mx. Keywords (length: 2)</p></body></html>"
+    )
+  end
+
+  it "passes all input data with context if a context keyword is provided along with a splat" do
+    view = Class.new(Hanami::View) do
+      config.paths = SPEC_ROOT.join("fixtures/templates")
+      config.layout = "app"
+      config.template = "greeting"
+      config.default_format = :html
+      config.default_context =
+
+      expose :greeting do |context:, prefix:, **kwargs|
+        "#{prefix} #{kwargs[:name]} (length: #{kwargs.length}, context: #{context.class.superclass})"
+      end
+    end.new
+
+    expect(view.(prefix: "Mx.", name: "Keywords", context:).to_s).to eql(
+      "<!DOCTYPE html><html><head><title>hanami-view rocks!</title></head><body><p>Mx. Keywords (length: 1, context: Hanami::View::Context)</p></body></html>"
     )
   end
 

@@ -12,7 +12,7 @@ module Hanami
       include Dry::Equalizer(:name, :proc, :object, :options)
 
       EXPOSURE_DEPENDENCY_PARAMETER_TYPES = %i[req opt].freeze
-      INPUT_PARAMETER_TYPES = %i[key keyreq keyrest].freeze
+      KEYWORD_INPUT_PARAMETER_TYPES = %i[key keyreq].freeze
 
       # @api private
       # @since 2.1.0
@@ -70,7 +70,7 @@ module Hanami
         @input_keys ||=
           if proc
             proc.parameters.each_with_object([]) { |(type, name), keys|
-              keys << name if INPUT_PARAMETER_TYPES.include?(type)
+              keys << name if KEYWORD_INPUT_PARAMETER_TYPES.include?(type)
             }
           else
             []
@@ -147,13 +147,17 @@ module Hanami
       end
 
       def proc_input_args(input)
+        args = {}
+
         if proc.parameters.any? { |(type, _name)| type == :keyrest }
-          input.except(:context)
-        else
-          input_keys.each_with_object({}) { |key, args|
-            args[key] = input[key] if input.key?(key)
-          }
+          args.merge! input.except(:context)
         end
+
+        input_keys.each { |key|
+          args[key] = input[key] if input.key?(key)
+        }
+
+        args
       end
 
       def prepare_proc(proc, object)
