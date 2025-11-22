@@ -2,7 +2,7 @@
 
 View layer for Hanami
 
-## Unreleased
+## v2.3.1 - 2025-11-22
 
 ### Fixed
 
