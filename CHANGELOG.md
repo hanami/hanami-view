@@ -2,6 +2,12 @@
 
 View layer for Hanami
 
+## Unreleased
+
+### Fixed
+
+- Pass through all input arguments when exposure procs receive a keyword splat. (@jaredcwhite in #269)
+
 ## v2.3.0 - 2025-11-12
 
 ### Fixed

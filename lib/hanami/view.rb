@@ -342,7 +342,7 @@ module Hanami
     #     default values for these parameters to make the corresponding input
     #     keys optional
     #   - To receive the Context object, provide a `context:` keyword parameter
-    #   - To receive the view's input arguments in their entirey, provide a
+    #   - To receive the view's input arguments in their entirety, provide a
     #     keywords splat parameter (i.e. `**input`)
     #
     #   @example Accessing input arguments
