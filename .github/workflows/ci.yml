@@ -19,6 +19,7 @@ jobs:
           - "3.4"
           - "3.3"
           - "3.2"
+          - "jruby"
     env:
       CLASSPATH: "" # tmp jruby build workaround
     steps:
