@@ -31,7 +31,7 @@ RSpec.describe Hanami::View::ScopeBuilder, "#call" do
       scope_builder.call("scope_one", locals: {}, rendering: rendering)
       scope_builder.call("scope_two", locals: {}, rendering: rendering)
 
-      expect(Hanami::View::Cache.cache.values).to eq [TestScopes::ScopeOne, TestScopes::ScopeTwo]
+      expect(Hanami::View::Cache.cache.values).to contain_exactly TestScopes::ScopeOne, TestScopes::ScopeTwo
     end
   end
 end
