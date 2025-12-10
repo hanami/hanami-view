@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "hanami/view/tilt"
+require "hanami/view/tilt/haml_adapter"
+
 RSpec.describe "Template engines / haml" do
   let(:base_view) {
     Class.new(Hanami::View) do
