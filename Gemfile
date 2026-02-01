@@ -13,6 +13,7 @@ group :tools do
 end
 
 group :test do
+  gem "rspec"
   gem "saharspec"
 
   gem "dry-inflector"
