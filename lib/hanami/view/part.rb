@@ -78,9 +78,9 @@ module Hanami
       # @api public
       # @since 2.1.0
       def initialize(
+        value:,
         rendering: RenderingMissing.new,
-        name: self.class.part_name(rendering.inflector),
-        value:
+        name: self.class.part_name(rendering.inflector)
       )
         @_name = name
         @_value = value
@@ -119,8 +119,6 @@ module Hanami
         _rendering.context
       end
 
-      # rubocop:disable Naming/UncommunicativeMethodParamName
-
       # Renders a new partial with the part included in its locals.
       #
       # @overload _render(partial_name, as: _name, **locals, &block)
@@ -141,7 +139,6 @@ module Hanami
       def _render(partial_name, as: _name, **locals, &block)
         _rendering.partial(partial_name, _rendering.scope({as => self}.merge(locals)), &block)
       end
-      # rubocop:enable Naming/UncommunicativeMethodParamName
 
       # Builds a new scope with the part included in its locals.
       #

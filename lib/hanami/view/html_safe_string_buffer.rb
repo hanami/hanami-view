@@ -34,7 +34,7 @@ module Hanami
       # being called. For our needs, `#return_buffer` must be called at all times in order to ensure
       # the captured string is consistently marked as `.html_safe`.
       def call(exp)
-        [preamble, compile(exp), postamble].flatten.compact.join('; ')
+        [preamble, compile(exp), postamble].flatten.compact.join("; ")
       end
 
       # Marks the string returned from the captured buffer as HTML safe.

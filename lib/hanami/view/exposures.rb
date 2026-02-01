@@ -54,12 +54,14 @@ module Hanami
       # @api private
       # @since 2.1.0
       def bind(obj)
-        bound_exposures = exposures.each_with_object({}) { |(name, exposure), memo|
-          memo[name] = exposure.bind(obj)
+        bound_exposures = exposures.transform_values { |exposure|
+          exposure.bind(obj)
         }
 
         self.class.new(bound_exposures)
       end
+
+      # rubocop:disable Metrics/PerceivedComplexity
 
       # @api private
       # @since 2.1.0
@@ -87,6 +89,8 @@ module Hanami
             end
           }
       end
+
+      # rubocop:enable Metrics/PerceivedComplexity
 
       private
 

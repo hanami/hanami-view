@@ -57,7 +57,7 @@ RSpec.describe "helpers" do
 
     let(:view) {
       dir = self.dir
-      part_class  = self.part_class
+      part_class = self.part_class
 
       Class.new(Hanami::View) {
         config.paths = dir

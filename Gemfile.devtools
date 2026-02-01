@@ -1,12 +1,17 @@
 # frozen_string_literal: true
 
-# this file is managed by dry-rb/devtools project
+# This file is synced from hanakai-rb/repo-sync
 
-git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
+gem "rake", ">= 12.3.3"
 
 group :test do
-  # 0.18.x breaks codacy result parser
-  gem "simplecov", "0.17.1", require: false, platforms: :ruby
+  gem "simplecov", require: false, platforms: :ruby
+  gem "simplecov-cobertura", require: false, platforms: :ruby
+  gem "rexml", require: false
 
   gem "warning"
+end
+
+group :tools do
+  gem "rubocop"
 end

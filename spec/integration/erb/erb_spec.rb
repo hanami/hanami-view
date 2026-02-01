@@ -126,7 +126,7 @@ RSpec.describe Hanami::View::ERB::Template do
   it "captures content within blocks in expression tags" do
     scope = Class.new do
       def wrapped
-        %{<div class="wrapped">#{yield}</div>}.html_safe
+        %(<div class="wrapped">#{yield}</div>).html_safe
       end
     end.new
 
@@ -148,7 +148,7 @@ RSpec.describe Hanami::View::ERB::Template do
   it "captures content within nested blocks in expression tags" do
     scope = Class.new do
       def wrapped
-        %{<div class="wrapped">#{yield}</div>}.html_safe
+        %(<div class="wrapped">#{yield}</div>).html_safe
       end
     end.new
 
@@ -174,7 +174,7 @@ RSpec.describe Hanami::View::ERB::Template do
   it "captures content within blocks in expression tags, mixed with nested flow control code" do
     scope = Class.new do
       def wrapped
-        %{<div class="wrapped">#{yield}</div>}.html_safe
+        %(<div class="wrapped">#{yield}</div>).html_safe
       end
     end.new
 

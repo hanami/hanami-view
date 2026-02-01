@@ -116,7 +116,7 @@ RSpec.describe Hanami::View::Exposure do
 
   describe "#dependency_names" do
     context "proc provided" do
-      let(:proc) { -> input, foo, bar { "hi" } } # rubocop:disable Lint/UnusedBlockArgument
+      let(:proc) { -> input, foo, bar { "hi" } }
 
       it "returns an array of exposure dependencies derived from the proc's argument names" do
         expect(exposure.dependency_names).to eql [:input, :foo, :bar]
@@ -128,7 +128,7 @@ RSpec.describe Hanami::View::Exposure do
 
       let(:object) do
         Class.new do
-          def hello(input, bar, baz) # rubocop:disable Lint/UnusedMethodArgument
+          def hello(input, bar, baz)
             "hi there, #{input.fetch(:name)}"
           end
         end.new

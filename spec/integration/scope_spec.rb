@@ -215,7 +215,7 @@ RSpec.describe "Scopes" do
     module Test::Scopes
       class Greeting < Hanami::View::Scope
         def greeting
-          _locals.fetch(:greeting) { "Howdy" }
+          _locals.fetch(:greeting, "Howdy")
         end
       end
     end

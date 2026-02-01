@@ -117,7 +117,7 @@ RSpec.describe Hanami::View::Helpers::TagHelper do
         expect(tag.input(value: [123, "abc", [789]])).to eq %(<input value="123 abc 789">)
 
         obj = Class.new {
-          def to_s; "hello"; end
+          def to_s = "hello"
         }.new
         expect(tag.input(value: obj)).to eq %(<input value="hello">)
 
@@ -143,7 +143,7 @@ RSpec.describe Hanami::View::Helpers::TagHelper do
           truespeed: true,
           allowpaymentrequest: true,
           nomodule: true,
-          playsinline: true,
+          playsinline: true
         )
 
         expect(html).to eq <<~HTML.gsub(/\s+/, " ").strip
@@ -223,21 +223,21 @@ RSpec.describe Hanami::View::Helpers::TagHelper do
                 hash: {a: true, b: "truthy", falsey: false, nil: nil},
                 empty_hash: {},
                 tokens: ["a", {b: true, c: false}],
-                empty_tokens: [{a: false}],
+                empty_tokens: [{a: false}]
               }
             )
           ).to eq <<~HTML.gsub(/\s+/, " ").strip
-          <a
-            aria-string="hello"
-            aria-string-with-quotes="double&quot;quote&quot;party&quot;"
-            aria-symbol="foo"
-            aria-a-number="1"
-            aria-a-float="3.14"
-            aria-truthy="true"
-            aria-falsey="false"
-            aria-array="1 2 3"
-            aria-hash="a b"
-            aria-tokens="a b"></a>
+            <a
+              aria-string="hello"
+              aria-string-with-quotes="double&quot;quote&quot;party&quot;"
+              aria-symbol="foo"
+              aria-a-number="1"
+              aria-a-float="3.14"
+              aria-truthy="true"
+              aria-falsey="false"
+              aria-array="1 2 3"
+              aria-hash="a b"
+              aria-tokens="a b"></a>
           HTML
         end
       end

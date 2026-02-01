@@ -86,6 +86,8 @@ module Hanami
         BLOCK_LINE_RE = /\s*((\s+|\))do|\{)(\s*\|[^|]*\|)?\s*\Z/
         END_LINE_RE = /\bend\b/
 
+        # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+
         def call(input)
           results = [[:multi]]
           pos = 0
@@ -153,8 +155,10 @@ module Hanami
           end
 
           # Add any text after the final ERB tag
-          results.last << [:static, input[pos..-1]]
+          results.last << [:static, input[pos..]]
         end
+
+        # rubocop:enable Metrics/AbcSize, Metrics/PerceivedComplexity
       end
     end
   end

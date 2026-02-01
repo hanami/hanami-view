@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "json"
-require "set"
 
 module Hanami
   class View
@@ -16,15 +15,15 @@ module Hanami
         class TagBuilder
           # @api private
           # @since 2.1.0
-          HTML_VOID_ELEMENTS = %i(
+          HTML_VOID_ELEMENTS = %i[
             area base br col embed hr img input keygen link meta param source track wbr
-          ).to_set
+          ].to_set
 
           # @api private
           # @since 2.1.0
-          SVG_SELF_CLOSING_ELEMENTS = %i(
+          SVG_SELF_CLOSING_ELEMENTS = %i[
             animate animateMotion animateTransform circle ellipse line path polygon polyline rect set stop use view
-          ).to_set
+          ].to_set
 
           # @api private
           # @since 2.1.0
@@ -32,7 +31,7 @@ module Hanami
 
           # @api private
           # @since 2.1.0
-          BOOLEAN_ATTRIBUTES = %w(
+          BOOLEAN_ATTRIBUTES = %w[
             allowfullscreen allowpaymentrequest async autofocus
             autoplay checked compact controls declare default
             defaultchecked defaultmuted defaultselected defer
@@ -42,7 +41,7 @@ module Hanami
             pauseonexit playsinline readonly required reversed
             scoped seamless selected sortable truespeed
             typemustmatch visible
-          ).to_set
+          ].to_set
           BOOLEAN_ATTRIBUTES.merge(BOOLEAN_ATTRIBUTES.map(&:to_sym))
           BOOLEAN_ATTRIBUTES.freeze
 
@@ -125,6 +124,8 @@ module Hanami
             "<#{name}#{tag_options}>#{PRE_CONTENT_STRINGS[name]}#{content}</#{name}>".html_safe
           end
 
+          # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+
           # @api private
           # @since 2.1.0
           def tag_options(**options)
@@ -172,6 +173,8 @@ module Hanami
 
             output unless output.empty?
           end
+
+          # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 
           # @api private
           # @since 2.1.0

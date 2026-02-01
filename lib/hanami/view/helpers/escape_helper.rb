@@ -31,7 +31,7 @@ module Hanami
       # @api public
       # @since 2.1.0
       module EscapeHelper
-        extend self
+        module_function
 
         # Returns an escaped string that is safe to include in HTML.
         #
@@ -160,7 +160,7 @@ module Hanami
 
           return starting_char if name.size == 1
 
-          following_chars = name[1..-1]
+          following_chars = name[1..]
           following_chars.gsub!(INVALID_TAG_NAME_FOLLOWING_REGEXP, TAG_NAME_REPLACEMENT_CHAR)
 
           starting_char << following_chars
@@ -186,7 +186,7 @@ module Hanami
 
         # @api private
         # @since 2.1.0
-        TAG_NAME_FOLLOWING_CODEPOINTS = "#{TAG_NAME_START_CODEPOINTS}\\-.0-9\u{B7}\u{0300}-\u{036F}\u{203F}-\u{2040}"
+        TAG_NAME_FOLLOWING_CODEPOINTS = "#{TAG_NAME_START_CODEPOINTS}\\-.0-9\u{B7}\u{0300}-\u{036F}\u{203F}-\u{2040}".freeze
         private_constant :TAG_NAME_FOLLOWING_CODEPOINTS
 
         # @api private

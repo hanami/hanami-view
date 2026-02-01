@@ -28,7 +28,7 @@ module Hanami
       # @api public
       # @since 2.1.0
       module NumberFormattingHelper
-        extend self
+        module_function
 
         # Default delimiter
         #
@@ -87,8 +87,6 @@ module Hanami
           Formatter.call(number, delimiter: delimiter, separator: separator, precision: precision)
         end
 
-        private
-
         # Formatter
         #
         # @since 2.1.0
@@ -135,8 +133,8 @@ module Hanami
                 Float(number)
               rescue TypeError
                 raise ArgumentError, "failed to convert #{number.inspect} to float"
-              rescue ArgumentError => e
-                raise e.class, "failed to convert #{number.inspect} to float"
+              rescue ArgumentError => exception
+                raise exception.class, "failed to convert #{number.inspect} to float"
               end
             end
           end

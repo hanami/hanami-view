@@ -17,7 +17,7 @@ module Hanami
         #
         # @api public
         # @since 2.1.0
-        def call(name = nil, locals:, rendering:) # rubocop:disable Style/OptionalArguments
+        def call(name = nil, locals:, rendering:)
           klass = scope_class(name, rendering: rendering)
 
           klass.new(name: name, locals: locals, rendering: rendering)
@@ -45,7 +45,7 @@ module Hanami
           # Give autoloaders a chance to act
           begin
             klass = namespace.const_get(name)
-          rescue NameError # rubocop:disable Lint/HandleExceptions
+          rescue NameError # rubocop:disable Lint/SuppressedException
           end
 
           if !klass && namespace.const_defined?(name, false)

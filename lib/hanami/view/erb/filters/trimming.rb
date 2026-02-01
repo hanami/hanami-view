@@ -22,19 +22,25 @@ module Hanami
         class Trimming < Temple::Filter
           define_options trim: true
 
+          # rubocop:disable Metrics/PerceivedComplexity
+
           def on_multi(*exps)
-            exps = exps.each_with_index.map do |e,i|
-              if e.first == :static && i > 0 && exps[i-1].first == :code
-                [:static, e.last.lstrip]
-              elsif e.first == :static && i < exps.size-1 && exps[i+1].first == :code
-                [:static, e.last.rstrip]
-              else
-                compile(e)
+            if options[:trim]
+              exps = exps.each_with_index.map do |e, i|
+                if e.first == :static && i > 0 && exps[i - 1].first == :code
+                  [:static, e.last.lstrip]
+                elsif e.first == :static && i < exps.size - 1 && exps[i + 1].first == :code
+                  [:static, e.last.rstrip]
+                else
+                  compile(e)
+                end
               end
-            end if options[:trim]
+            end
 
             [:multi, *exps]
           end
+
+          # rubocop:enable Metrics/PerceivedComplexity
         end
       end
     end
