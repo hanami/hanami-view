@@ -122,12 +122,10 @@ module Hanami
           else
             object.instance_exec(*args, &proc)
           end
+        elsif proc.is_a?(Method)
+          proc.(*args, **keywords)
         else
-          if proc.is_a?(Method)
-            proc.(*args, **keywords)
-          else
-            object.instance_exec(*args, **keywords, &proc)
-          end
+          object.instance_exec(*args, **keywords, &proc)
         end
       end
 

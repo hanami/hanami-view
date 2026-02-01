@@ -18,7 +18,7 @@ module Hanami
         #
         # @api public
         # @since 2.1.0
-        def call(name, value, as: nil, rendering:)
+        def call(name, value, rendering:, as: nil)
           builder = value.respond_to?(:to_ary) ? :build_collection_part : :build_part
 
           send(builder, name: name, value: value, as: as, rendering: rendering)
@@ -32,7 +32,7 @@ module Hanami
           klass.new(name: name, value: value, rendering: rendering)
         end
 
-        def build_collection_part(name:, value:, as: nil, rendering:)
+        def build_collection_part(name:, value:, rendering:, as: nil)
           item_name, item_as = collection_item_name_as(name, as, inflector: rendering.inflector)
           item_part_class = part_class(name: item_name, as: item_as, rendering: rendering)
 
@@ -72,7 +72,6 @@ module Hanami
           end
         end
 
-        # rubocop:disable Metrics/PerceivedComplexity
         def resolve_part_class(name:, rendering:)
           namespace = rendering.config.part_namespace
           return rendering.config.part_class unless namespace
@@ -82,7 +81,7 @@ module Hanami
           # Give autoloaders a chance to act
           begin
             klass = namespace.const_get(name)
-          rescue NameError # rubocop:disable Lint/HandleExceptions
+          rescue NameError # rubocop:disable Lint/SuppressedException
           end
 
           if !klass && namespace.const_defined?(name, false)
@@ -95,7 +94,6 @@ module Hanami
             rendering.config.part_class
           end
         end
-        # rubocop:enable Metrics/PerceivedComplexity
       end
     end
   end

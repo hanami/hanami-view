@@ -11,6 +11,7 @@ RSpec.describe "Context" do
 
       class Context < Hanami::View::Context
         attr_reader :assets
+
         decorate :assets
 
         def initialize(assets:, **options)

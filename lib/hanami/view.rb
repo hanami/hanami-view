@@ -31,13 +31,13 @@ module Hanami
         loader.ignore(
           "#{root}/hanami-view.rb",
           "#{root}/hanami/view/version.rb",
-          "#{root}/hanami/view/errors.rb",
+          "#{root}/hanami/view/errors.rb"
         )
         loader.inflector = Zeitwerk::GemInflector.new("#{root}/hanami-view.rb")
         loader.inflector.inflect(
           "erb" => "ERB",
           "html" => "HTML",
-          "html_safe_string_buffer" => "HTMLSafeStringBuffer",
+          "html_safe_string_buffer" => "HTMLSafeStringBuffer"
         )
       end
     end
@@ -551,7 +551,7 @@ module Hanami
     #
     # @api private
     # @since 2.1.0
-    def exposures
+    def exposures # rubocop:disable Style/TrivialAccessors
       @exposures
     end
 

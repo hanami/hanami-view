@@ -32,7 +32,7 @@ module Hanami
       # @api public
       # @since 2.1.0
       module TagHelper
-        extend self
+        module_function
 
         # Returns a tag builder for building HTML tag strings.
         #
@@ -187,9 +187,7 @@ module Hanami
         # @api private
         # @since 2.1.0
         def tag_builder
-          @tag_builder ||= begin
-            TagBuilder.new(inflector: tag_builder_inflector)
-          end
+          @tag_builder ||= TagBuilder.new(inflector: tag_builder_inflector)
         end
 
         # @api private

@@ -1,4 +1,6 @@
-RSpec.describe "Tempalte rendering / locals" do
+# frozen_string_literal: true
+
+RSpec.describe "Template rendering / locals" do
   let(:base_view) {
     Class.new(Hanami::View) do
       config.paths = FIXTURES_PATH.join("integration/template_rendering/locals")
@@ -13,9 +15,9 @@ RSpec.describe "Tempalte rendering / locals" do
     end.new
 
     if RUBY_VERSION < "3.4"
-      expect(view.call(text: "Hello").to_s).to eq %{Locals: {:text=>"Hello"}}
+      expect(view.call(text: "Hello").to_s).to eq %(Locals: {:text=>"Hello"})
     else
-      expect(view.call(text: "Hello").to_s).to eq %{Locals: {text: "Hello"}}
+      expect(view.call(text: "Hello").to_s).to eq %(Locals: {text: "Hello"})
     end
   end
 end

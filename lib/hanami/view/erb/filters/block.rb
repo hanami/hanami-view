@@ -25,7 +25,8 @@ module Hanami
               content.pop
             end
 
-            [:multi,
+            [
+              :multi,
               # Capture the result of the code in a variable. We can't do `[:dynamic, code]` because
               # it's probably not a complete expression (which is a requirement for Temple).
               [:code, "#{tmp} = #{code}"],

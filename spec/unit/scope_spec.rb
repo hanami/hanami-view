@@ -30,7 +30,7 @@ RSpec.describe Hanami::View::Scope do
       it "renders a partial with provided locals" do
         scope_with_locals = described_class.new(
           locals: {foo: "bar"},
-          rendering: rendering,
+          rendering: rendering
         )
 
         scope.render("info", foo: "bar")

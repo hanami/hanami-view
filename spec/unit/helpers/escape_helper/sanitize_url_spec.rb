@@ -25,7 +25,7 @@ RSpec.describe Hanami::View::Helpers::EscapeHelper, ".sanitize_url" do
       https://hanamirb.org/guides/index.html
       mailto:user@example.com
       mailto:user@example.com?Subject=Hello
-    ]
+    ].freeze
 
     it "returns a safe string" do
       expect(sanitize_url(URLS.first)).to be_html_safe

@@ -14,6 +14,7 @@ RSpec.describe Hanami::View::Context do
         attr_reader :injected_obj, :internal_var
 
         def initialize(injected_obj:)
+          super()
           @injected_obj = injected_obj
           @internal_var = "internal"
         end
@@ -44,6 +45,7 @@ RSpec.describe Hanami::View::Context do
         decorate :assets
 
         def initialize(assets:)
+          super()
           @assets = assets
         end
       }

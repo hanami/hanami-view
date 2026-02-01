@@ -298,7 +298,6 @@ RSpec.describe "exposures" do
       config.layout = "app"
       config.template = "greeting"
       config.default_format = :html
-      config.default_context =
 
       expose :greeting do |context:, prefix:, **kwargs|
         "#{prefix} #{kwargs[:name]} (length: #{kwargs.length}, context: #{context.class.superclass})"

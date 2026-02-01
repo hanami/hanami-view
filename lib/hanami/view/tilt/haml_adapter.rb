@@ -34,7 +34,7 @@ module Hanami
         Template = Temple::Templates::Tilt(
           ::Haml::Engine,
           use_html_safe: true,
-          capture_generator: HTMLSafeStringBuffer,
+          capture_generator: HTMLSafeStringBuffer
         )
       end
     end
