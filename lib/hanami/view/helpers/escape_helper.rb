@@ -186,7 +186,8 @@ module Hanami
 
         # @api private
         # @since 2.1.0
-        TAG_NAME_FOLLOWING_CODEPOINTS = "#{TAG_NAME_START_CODEPOINTS}\\-.0-9\u{B7}\u{0300}-\u{036F}\u{203F}-\u{2040}".freeze
+        TAG_NAME_FOLLOWING_CODEPOINTS =
+          "#{TAG_NAME_START_CODEPOINTS}\\-.0-9\u{B7}\u{0300}-\u{036F}\u{203F}-\u{2040}".freeze
         private_constant :TAG_NAME_FOLLOWING_CODEPOINTS
 
         # @api private
