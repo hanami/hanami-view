@@ -1,16 +1,10 @@
 # frozen_string_literal: true
 
-begin
-  require "pry-byebug"
-rescue LoadError;
-end
 SPEC_ROOT = Pathname(__FILE__).dirname
 FIXTURES_PATH = SPEC_ROOT.join("fixtures")
 
 require "slim"
 require "hanami/view"
-
-require_relative "support/tmp_directory"
 
 module TestNamespace
   def remove_constants
@@ -23,11 +17,6 @@ module Test
 end
 
 RSpec.configure do |config|
-  config.disable_monkey_patching!
-
-  config.order = :random
-  Kernel.srand config.seed
-
   config.after do
     Test.remove_constants
   end
@@ -44,3 +33,5 @@ RSpec::Matchers.define :part_including do |data|
     }
   }
 end
+
+SPEC_ROOT.glob("support/**/*.rb").each { |f| require(f) }
