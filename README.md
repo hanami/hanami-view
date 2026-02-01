@@ -1,22 +1,9 @@
-# Hanami::View
+<!--- This file is synced from hanakai-rb/repo-sync -->
 
-A view layer for [Hanami](http://hanamirb.org)
+[rubygem]: https://rubygems.org/gems/hanami-view
+[actions]: https://github.com/hanami/hanami-view/actions
 
-## Status
-
-[![Gem Version](https://badge.fury.io/rb/hanami-view.svg)](https://badge.fury.io/rb/hanami-view)
-[![CI](https://github.com/hanami/view/actions/workflows/ci.yml/badge.svg)](https://github.com/hanami/view/actions?query=workflow%3Aci+branch%3Amain)
-
-## Contact
-
-* Home page: http://hanamirb.org
-* Community: http://hanamirb.org/community
-* Guides: https://guides.hanamirb.org
-* Mailing List: http://hanamirb.org/mailing-list
-* API Doc: http://rubydoc.info/gems/hanami-view
-* Chat: http://chat.hanamirb.org
-
-## Rubies
+# Hanami View [![Gem Version](https://badge.fury.io/rb/hanami-view.svg)][rubygem] [![CI Status](https://github.com/hanami/hanami-view/workflows/CI/badge.svg)][actions]
 
 ## Installation
 
@@ -38,10 +25,6 @@ Or install it yourself as:
 $ gem install hanami-view
 ```
 
-## Versioning
-
-__Hanami::View__ uses [Semantic Versioning 2.0.0](http://semver.org)
-
 ## Contributing
 
 1. Fork it
@@ -50,6 +33,13 @@ __Hanami::View__ uses [Semantic Versioning 2.0.0](http://semver.org)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
-## Copyright
+## Links
 
-Copyright © 2014–2024 Hanami Team – Released under MIT License
+- [User documentation](https://hanamirb.org)
+- [API documentation](http://rubydoc.info/gems/hanami-view)
+
+
+## License
+
+See `LICENSE` file.
+
