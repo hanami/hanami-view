@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-begin
-  require "pry-byebug"
-rescue LoadError;
-end
 SPEC_ROOT = Pathname(__FILE__).dirname
 FIXTURES_PATH = SPEC_ROOT.join("fixtures")
 
