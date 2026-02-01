@@ -34,4 +34,4 @@ RSpec::Matchers.define :part_including do |data|
   }
 end
 
-SPEC_ROOT.glob("support/**/*.rb").each { require(it) }
+SPEC_ROOT.glob("support/**/*.rb").each { |f| require(f) }
