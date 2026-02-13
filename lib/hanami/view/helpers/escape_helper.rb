@@ -31,7 +31,7 @@ module Hanami
       # @api public
       # @since 2.1.0
       module EscapeHelper
-        module_function
+        extend self
 
         # Returns an escaped string that is safe to include in HTML.
         #

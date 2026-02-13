@@ -28,7 +28,7 @@ module Hanami
       # @api public
       # @since 2.1.0
       module NumberFormattingHelper
-        module_function
+        extend self
 
         # Default delimiter
         #
