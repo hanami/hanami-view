@@ -185,13 +185,13 @@ RSpec.describe "exposures" do
       config.template = "users_with_count"
       config.default_format = :html
 
-      expose :users, as: Test::UserPart
+      expose :users, as: Test::UserPart, decorate: true
 
       expose :users_count do |users|
         "#{users.length} users"
       end
 
-      expose :article do |users|
+      expose :article, decorate: true do |users|
         "Great article from #{users.first.display_name}"
       end
     end.new
