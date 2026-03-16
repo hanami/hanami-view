@@ -8,7 +8,7 @@ RSpec.describe "hanami-view" do
       config.template = "users"
       config.default_format = :html
 
-      expose :users do
+      expose :users, decorate: true do
         [
           {name: "Jane", email: "jane@doe.org"},
           {name: "Joe", email: "joe@doe.org"}

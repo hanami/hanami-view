@@ -63,7 +63,7 @@ RSpec.describe "helpers" do
         config.paths = dir
         config.template = "template"
 
-        expose :city, as: part_class
+        expose :city, as: part_class, decorate: true
       }.new
     }
 
