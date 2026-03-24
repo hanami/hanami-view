@@ -85,8 +85,8 @@ module Hanami
 
       # @api private
       # @since 2.1.0
-      def decorate?
-        options.fetch(:decorate, true)
+      def decorate?(default: false)
+        options.fetch(:decorate, default)
       end
 
       # @api private

@@ -37,11 +37,15 @@ RSpec.describe Hanami::View::Exposure do
     end
 
     describe "#decorate?" do
-      it "is true by default" do
-        expect(exposure.decorate?).to eq true
+      it "is false by default" do
+        expect(exposure.decorate?).to eq false
       end
 
-      it "can be set on initialization" do
+      it "can be set to true on initialization" do
+        expect(described_class.new(:hello, decorate: true).decorate?).to eq true
+      end
+
+      it "can be set to false on initialization" do
         expect(described_class.new(:hello, decorate: false).decorate?).to eq false
       end
     end

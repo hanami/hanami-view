@@ -235,6 +235,23 @@ module Hanami
     # @!scope class
     setting :inflector, default: Dry::Inflector.new
 
+    # @overload config.decorate_exposures=(value)
+    #   Controls whether exposures are decorated by default.
+    #
+    #   When set to `true`, all exposures will be decorated with matching Parts unless explicitly
+    #   marked with `decorate: false`.
+    #
+    #   When set to `false` (the default), exposures will not be decorated unless explicitly marked
+    #   with `decorate: true`, or declared with `decorate`.
+    #
+    #   Defaults to `false`.
+    #
+    #   @param value [Boolean] whether to decorate exposures by default
+    #   @api public
+    #   @since x.x.x
+    # @!scope class
+    setting :decorate_exposures, default: false
+
     # @overload config.renderer_options=(options)
     #   A hash of options to pass to the template engine. Template engines are
     #   provided by Tilt; see Tilt's documentation for what options your
@@ -288,13 +305,13 @@ module Hanami
     #   @param options [Hash] the exposure's options
     #   @option options [Boolean] :layout expose this value to the layout (defaults to false)
     #   @option options [Boolean] :decorate decorate this value in a matching Part (defaults to
-    #     true)
+    #     false, or the value of `config.decorate_exposures`)
     #   @option options [Symbol, Class] :as an alternative name or class to use when finding a
     #     matching Part
 
     # @overload expose(name, **options, &block)
     #   Define a value to be passed to the template. The return value of the
-    #   block will be decorated by a matching Part and passed to the template.
+    #   block will be passed to the template.
     #
     #   The block will be evaluated with the view instance as its `self`. The
     #   block's parameters will determine what it is given:
@@ -329,8 +346,8 @@ module Hanami
     #
     # @overload expose(name, **options)
     #   Define a value to be passed to the template, provided by an instance
-    #   method matching the name. The method's return value will be decorated by
-    #   a matching Part and passed to the template.
+    #   method matching the name. The method's return value will be passed to
+    #   the template.
     #
     #   The method's parameters will determine what it is given:
     #
@@ -369,8 +386,8 @@ module Hanami
     #
     # @overload expose(name, **options)
     #   Define a single value to pass through from the input data (when there is
-    #   no instance method matching the `name`). This value will be decorated by
-    #   a matching Part and passed to the template.
+    #   no instance method matching the `name`). This value will be passed to
+    #   the template.
     #
     #   @param name [Symbol] name for the exposure
     #   @macro exposure_options
@@ -380,7 +397,7 @@ module Hanami
     # @overload expose(*names, **options)
     #   Define multiple values to pass through from the input data (when there
     #   is no instance methods matching their names). These values will be
-    #   decorated by matching Parts and passed through to the template.
+    #   passed through to the template.
     #
     #   The provided options will be applied to all the exposures.
     #
@@ -409,6 +426,18 @@ module Hanami
     # @since 2.1.0
     def self.private_expose(*names, **options, &block)
       expose(*names, **options, private: true, &block)
+    end
+
+    # Defines an exposure that will be decorated with a matching Part.
+    #
+    # This is a shorthand for `expose(..., decorate: true)`.
+    #
+    # @see expose
+    #
+    # @api public
+    # @since 2.1.0
+    def self.decorate(*names, **options, &block)
+      expose(*names, **options, decorate: true, &block)
     end
 
     # Returns the defined exposures. These are unbound, since bound exposures
@@ -597,7 +626,7 @@ module Hanami
 
     def locals(rendering, input)
       exposures.(context: rendering.context, **input) do |value, exposure|
-        if exposure.decorate? && value
+        if exposure.decorate?(default: config.decorate_exposures) && value
           rendering.part(exposure.name, value, as: exposure.options[:as])
         else
           value

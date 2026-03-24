@@ -253,7 +253,7 @@ RSpec.describe "Scopes" do
       config.scope_namespace = Test::Scopes
       config.template = "scope_from_part"
 
-      expose :message
+      expose :message, decorate: true
     end.new
 
     expect(view.(message: {text: "Hello from a part"}).to_s).to eq "Greeting: Hello from a part!"

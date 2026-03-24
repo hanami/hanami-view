@@ -6,7 +6,7 @@ RSpec.describe "View / exposures" do
       config.paths = SPEC_ROOT.join("fixtures/templates")
       config.template = "greeting"
 
-      expose :greeting do |greeting:, context:|
+      expose :greeting, decorate: true do |greeting:, context:|
         "#{greeting}, #{context.name}"
       end
     end.new
