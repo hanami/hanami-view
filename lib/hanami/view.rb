@@ -596,7 +596,9 @@ module Hanami
     #
     # @api public
     # @since 2.1.0
-    def call(format: cached_config.default_format, context: cached_config.default_context, layout: cached_config.layout, **input)
+    def call(format: cached_config.default_format,
+             context: cached_config.default_context,
+             layout: cached_config.layout, **input)
       rendering = self.rendering(format: format, context: context)
       scope_class = cached_config.scope
 

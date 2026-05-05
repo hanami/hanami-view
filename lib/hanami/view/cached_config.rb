@@ -26,7 +26,7 @@ module Hanami
       :part_builder,
       :scope_builder,
       :renderer_engine_mapping,
-      :renderer_options,
+      :renderer_options
     ) do
       def self.from_config(config)
         new(
@@ -45,7 +45,7 @@ module Hanami
           part_builder: config.part_builder,
           scope_builder: config.scope_builder,
           renderer_engine_mapping: config.renderer_engine_mapping,
-          renderer_options: config.renderer_options,
+          renderer_options: config.renderer_options
         )
       end
 
