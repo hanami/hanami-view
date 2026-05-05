@@ -10,6 +10,10 @@ module Hanami
       attr_reader :config, :format
 
       # @api private
+      # @since 2.3.0
+      attr_reader :cached_config
+
+      # @api private
       # @since 2.1.0
       attr_reader :inflector, :part_builder, :scope_builder
 
@@ -19,16 +23,19 @@ module Hanami
 
       # @api private
       # @since 2.1.0
-      def initialize(config:, format:, context:)
+      def initialize(config:, format:, context:, cached_config: nil)
+        cached_config ||= CachedConfig.from_config(config)
+
         @config = config
+        @cached_config = cached_config
         @format = format
 
-        @inflector = config.inflector
-        @part_builder = config.part_builder
-        @scope_builder = config.scope_builder
+        @inflector = cached_config.inflector
+        @part_builder = cached_config.part_builder
+        @scope_builder = cached_config.scope_builder
 
         @context = context.dup_for_rendering(self)
-        @renderer = Renderer.new(config)
+        @renderer = Renderer.new(cached_config)
       end
 
       # @api private

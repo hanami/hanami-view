@@ -543,13 +543,25 @@ module Hanami
     # @api private
     # @since 2.1.0
     def self.layout_path(layout)
-      File.join(*[config.layouts_dir, layout].compact)
+      File.join(*[cached_config.layouts_dir, layout].compact)
     end
 
     # @api private
     # @since 2.1.0
     def self.cache
       Cache
+    end
+
+    # Returns a frozen snapshot of the view's resolved configuration values, used on the rendering
+    # hot path to avoid the per-read overhead of dry-configurable's `method_missing` dispatch.
+    #
+    # The cache is built lazily on first access (which must occur after `config.finalize!`), and
+    # memoized per-class.
+    #
+    # @api private
+    # @since 2.3.0
+    def self.cached_config
+      @cached_config ||= CachedConfig.from_config(config)
     end
 
     # Returns an instance of the view. This binds the defined exposures to the view instance.
@@ -563,6 +575,7 @@ module Hanami
       self.class.config.finalize!
       ensure_config
 
+      @cached_config = self.class.cached_config
       @exposures = self.class.exposures.bind(self)
     end
 
@@ -573,6 +586,12 @@ module Hanami
     def config
       self.class.config
     end
+
+    # Returns the view's resolved configuration cache.
+    #
+    # @api private
+    # @since 2.3.0
+    attr_reader :cached_config
 
     # Returns the view's bound exposures.
     #
@@ -595,16 +614,17 @@ module Hanami
     #
     # @api public
     # @since 2.1.0
-    def call(format: config.default_format, context: config.default_context, layout: config.layout, **input)
+    def call(format: cached_config.default_format, context: cached_config.default_context, layout: cached_config.layout, **input)
       rendering = self.rendering(format: format, context: context)
+      scope_class = cached_config.scope
 
       locals = locals(rendering, input)
-      output = rendering.template(config.template, rendering.scope(config.scope, locals))
+      output = rendering.template(cached_config.template, rendering.scope(scope_class, locals))
 
       if layout
         output = rendering.template(
           self.class.layout_path(layout),
-          rendering.scope(config.scope, layout_locals(locals))
+          rendering.scope(scope_class, layout_locals(locals))
         ) { output }
       end
 
@@ -613,8 +633,8 @@ module Hanami
 
     # @api private
     # @since 2.1.0
-    def rendering(format: config.default_format, context: config.default_context)
-      Rendering.new(config: config, format: format, context: context)
+    def rendering(format: cached_config.default_format, context: cached_config.default_context)
+      Rendering.new(config: config, cached_config: cached_config, format: format, context: context)
     end
 
     private

@@ -20,13 +20,17 @@ module Hanami
       CURRENT_PATH_PREFIX = "."
 
       # @api private
-      # @since 2.1.0
-      attr_reader :config, :prefixes
+      # @since 2.3.0
+      attr_reader :cached_config
 
       # @api private
       # @since 2.1.0
-      def initialize(config)
-        @config = config
+      attr_reader :prefixes
+
+      # @api private
+      # @since 2.1.0
+      def initialize(cached_config)
+        @cached_config = cached_config
         @prefixes = [CURRENT_PATH_PREFIX]
       end
 
@@ -37,7 +41,7 @@ module Hanami
 
         template_path = lookup(name, format)
 
-        raise TemplateNotFoundError.new(name, format, config.paths) unless template_path
+        raise TemplateNotFoundError.new(name, format, cached_config.paths) unless template_path
 
         new_prefix = File.dirname(name)
         @prefixes << new_prefix unless @prefixes.include?(new_prefix)
@@ -56,9 +60,9 @@ module Hanami
       private
 
       def lookup(name, format)
-        View.cache.fetch_or_store(:lookup, name, format, config, prefixes) {
+        View.cache.fetch_or_store(:lookup, name, format, cached_config, prefixes) {
           catch :found do
-            config.paths.reduce(nil) do |_, path|
+            cached_config.paths.reduce(nil) do |_, path|
               prefixes.reduce(nil) do |_, prefix|
                 result = path.lookup(prefix, name, format)
                 throw :found, result if result
@@ -79,8 +83,8 @@ module Hanami
       end
 
       def tilt(path)
-        View.cache.fetch_or_store(:tilt, path, config) {
-          Hanami::View::Tilt[path, config.renderer_engine_mapping, config.renderer_options]
+        View.cache.fetch_or_store(:tilt, path, cached_config) {
+          Hanami::View::Tilt[path, cached_config.renderer_engine_mapping, cached_config.renderer_options]
         }
       end
     end
