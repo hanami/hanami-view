@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe Hanami::View::Renderer do
-  subject(:renderer) { Hanami::View::Renderer.new(view_class.cached_config) }
+  subject(:renderer) { Hanami::View::Renderer.new(cached_config) }
+
+  let(:cached_config) { Hanami::View::CachedConfig.from_config(view_class.config) }
 
   let(:view_class) {
     Class.new(Hanami::View) {

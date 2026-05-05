@@ -542,26 +542,8 @@ module Hanami
 
     # @api private
     # @since 2.1.0
-    def self.layout_path(layout)
-      File.join(*[cached_config.layouts_dir, layout].compact)
-    end
-
-    # @api private
-    # @since 2.1.0
     def self.cache
       Cache
-    end
-
-    # Returns a frozen snapshot of the view's resolved configuration values, used on the rendering
-    # hot path to avoid the per-read overhead of dry-configurable's `method_missing` dispatch.
-    #
-    # The cache is built lazily on first access (which must occur after `config.finalize!`), and
-    # memoized per-class.
-    #
-    # @api private
-    # @since 2.3.0
-    def self.cached_config
-      @cached_config ||= CachedConfig.from_config(config)
     end
 
     # Returns an instance of the view. This binds the defined exposures to the view instance.
@@ -575,7 +557,7 @@ module Hanami
       self.class.config.finalize!
       ensure_config
 
-      @cached_config = self.class.cached_config
+      @cached_config = CachedConfig.from_config(config)
       @exposures = self.class.exposures.bind(self)
     end
 
@@ -623,7 +605,7 @@ module Hanami
 
       if layout
         output = rendering.template(
-          self.class.layout_path(layout),
+          File.join(*[cached_config.layouts_dir, layout].compact),
           rendering.scope(scope_class, layout_locals(locals))
         ) { output }
       end
