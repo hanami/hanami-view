@@ -569,13 +569,6 @@ module Hanami
       self.class.config
     end
 
-    # Returns a frozen Data snapshot of the view's resolved configuration values.
-    # Used for fast hot-path reads during rendering.
-    #
-    # @api private
-    # @since 2.3.0
-    attr_reader :config_data
-
     # Returns the view's bound exposures.
     #
     # @return [Exposures]
@@ -624,6 +617,12 @@ module Hanami
     end
 
     private
+
+    # Frozen Data snapshot of the view's resolved configuration values.
+    # Used for fast hot-path reads during rendering.
+    #
+    # @since 2.3.0
+    attr_reader :config_data
 
     def ensure_config
       raise UndefinedConfigError, :paths unless Array(config.paths).any?

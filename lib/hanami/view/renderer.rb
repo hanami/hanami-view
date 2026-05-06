@@ -20,14 +20,6 @@ module Hanami
       CURRENT_PATH_PREFIX = "."
 
       # @api private
-      # @since 2.3.0
-      attr_reader :config_data
-
-      # @api private
-      # @since 2.1.0
-      attr_reader :prefixes
-
-      # @api private
       # @since 2.1.0
       def initialize(config_data)
         @config_data = config_data
@@ -58,6 +50,8 @@ module Hanami
       end
 
       private
+
+      attr_reader :config_data, :prefixes
 
       def lookup(name, format)
         View.cache.fetch_or_store(:lookup, name, format, config_data.object_id, prefixes) {

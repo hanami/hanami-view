@@ -25,7 +25,7 @@ module Hanami
 
       # @api private
       # @since 2.1.0
-      attr_reader :context, :renderer
+      attr_reader :context
 
       # @api private
       # @since 2.1.0
@@ -69,6 +69,10 @@ module Hanami
       def scope(name = nil, locals) # rubocop:disable Style/OptionalArguments
         scope_builder.(name, locals: locals, rendering: self)
       end
+
+      private
+
+      attr_reader :renderer
     end
   end
 end
