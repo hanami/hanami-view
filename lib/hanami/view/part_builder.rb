@@ -66,15 +66,15 @@ module Hanami
           if name.is_a?(Class)
             name
           else
-            View.cache.fetch_or_store(:part_class, name, rendering.cached_config) do
+            View.cache.fetch_or_store(:part_class, name, rendering.config_data.object_id) do
               resolve_part_class(name: name, rendering: rendering)
             end
           end
         end
 
         def resolve_part_class(name:, rendering:)
-          namespace = rendering.cached_config.part_namespace
-          return rendering.cached_config.part_class unless namespace
+          namespace = rendering.config_data.part_namespace
+          return rendering.config_data.part_class unless namespace
 
           name = rendering.inflector.camelize(name.to_s)
 
@@ -91,7 +91,7 @@ module Hanami
           if klass && klass < Part
             klass
           else
-            rendering.cached_config.part_class
+            rendering.config_data.part_class
           end
         end
       end

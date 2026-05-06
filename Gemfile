@@ -6,6 +6,8 @@ eval_gemfile "Gemfile.devtools"
 
 gemspec
 
+gem "dry-configurable", github: "dry-rb/dry-configurable", branch: "feature/add-config-to-data"
+
 group :tools do
   # Remove hotch until https://github.com/ko1/allocation_tracer/issues/19 is fixed and it can be
   # installed on macOS again.

@@ -7,11 +7,11 @@ module Hanami
     class Rendering
       # @api private
       # @since 2.1.0
-      attr_reader :config, :format
+      attr_reader :format
 
       # @api private
       # @since 2.3.0
-      attr_reader :cached_config
+      attr_reader :config_data
 
       # @api private
       # @since 2.1.0
@@ -23,19 +23,16 @@ module Hanami
 
       # @api private
       # @since 2.1.0
-      def initialize(config:, format:, context:, cached_config: nil)
-        cached_config ||= CachedConfig.from_config(config)
-
-        @config = config
-        @cached_config = cached_config
+      def initialize(config_data:, format:, context:)
+        @config_data = config_data
         @format = format
 
-        @inflector = cached_config.inflector
-        @part_builder = cached_config.part_builder
-        @scope_builder = cached_config.scope_builder
+        @inflector = config_data.inflector
+        @part_builder = config_data.part_builder
+        @scope_builder = config_data.scope_builder
 
         @context = context.dup_for_rendering(self)
-        @renderer = Renderer.new(cached_config)
+        @renderer = Renderer.new(config_data)
       end
 
       # @api private

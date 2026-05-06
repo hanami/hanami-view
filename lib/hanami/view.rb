@@ -557,7 +557,7 @@ module Hanami
       self.class.config.finalize!
       ensure_config
 
-      @cached_config = CachedConfig.from_config(config)
+      @config_data = config.to_data
       @exposures = self.class.exposures.bind(self)
     end
 
@@ -569,11 +569,12 @@ module Hanami
       self.class.config
     end
 
-    # Returns the view's resolved configuration cache.
+    # Returns a frozen Data snapshot of the view's resolved configuration values.
+    # Used for fast hot-path reads during rendering.
     #
     # @api private
     # @since 2.3.0
-    attr_reader :cached_config
+    attr_reader :config_data
 
     # Returns the view's bound exposures.
     #
@@ -596,18 +597,19 @@ module Hanami
     #
     # @api public
     # @since 2.1.0
-    def call(format: cached_config.default_format,
-             context: cached_config.default_context,
-             layout: cached_config.layout, **input)
+    def call(format: config_data.default_format,
+             context: config_data.default_context,
+             layout: config_data.layout,
+             **input)
       rendering = self.rendering(format: format, context: context)
-      scope_class = cached_config.scope
+      scope_class = config_data.scope
 
       locals = locals(rendering, input)
-      output = rendering.template(cached_config.template, rendering.scope(scope_class, locals))
+      output = rendering.template(config_data.template, rendering.scope(scope_class, locals))
 
       if layout
         output = rendering.template(
-          File.join(*[cached_config.layouts_dir, layout].compact),
+          File.join(*[config_data.layouts_dir, layout].compact),
           rendering.scope(scope_class, layout_locals(locals))
         ) { output }
       end
@@ -617,8 +619,8 @@ module Hanami
 
     # @api private
     # @since 2.1.0
-    def rendering(format: cached_config.default_format, context: cached_config.default_context)
-      Rendering.new(config: config, cached_config: cached_config, format: format, context: context)
+    def rendering(format: config_data.default_format, context: config_data.default_context)
+      Rendering.new(config_data:, format:, context:)
     end
 
     private
@@ -630,7 +632,7 @@ module Hanami
 
     def locals(rendering, input)
       exposures.(context: rendering.context, **input) do |value, exposure|
-        if exposure.decorate?(default: config.decorate_exposures) && value
+        if exposure.decorate?(default: config_data.decorate_exposures) && value
           rendering.part(exposure.name, value, as: exposure.options[:as])
         else
           value
