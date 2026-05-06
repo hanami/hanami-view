@@ -27,11 +27,11 @@ module Hanami
 
         def scope_class(name = nil, rendering:)
           if name.nil?
-            rendering.config_data.scope_class
+            rendering.scope_class
           elsif name.is_a?(Class)
             name
           else
-            View.cache.fetch_or_store(name, rendering.config_data.object_id) do
+            View.cache.fetch_or_store(name, rendering.cache_key) do
               resolve_scope_class(name: name, rendering: rendering)
             end
           end
@@ -40,7 +40,7 @@ module Hanami
         def resolve_scope_class(name:, rendering:)
           name = rendering.inflector.camelize(name.to_s)
 
-          namespace = rendering.config_data.scope_namespace
+          namespace = rendering.scope_namespace
 
           # Give autoloaders a chance to act
           begin
@@ -55,7 +55,7 @@ module Hanami
           if klass && klass < Scope
             klass
           else
-            rendering.config_data.scope_class
+            rendering.scope_class
           end
         end
       end

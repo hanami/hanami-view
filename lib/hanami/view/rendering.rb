@@ -10,12 +10,18 @@ module Hanami
       attr_reader :format
 
       # @api private
-      # @since 2.3.0
-      attr_reader :config_data
-
-      # @api private
       # @since 2.1.0
       attr_reader :inflector, :part_builder, :scope_builder
+
+      # @api private
+      # @since 2.3.0
+      attr_reader :part_class, :part_namespace, :scope_class, :scope_namespace
+
+      # Stable identity for the underlying config snapshot, suitable as a cache-key component.
+      #
+      # @api private
+      # @since 2.3.0
+      attr_reader :cache_key
 
       # @api private
       # @since 2.1.0
@@ -24,12 +30,17 @@ module Hanami
       # @api private
       # @since 2.1.0
       def initialize(config_data:, format:, context:)
-        @config_data = config_data
         @format = format
 
         @inflector = config_data.inflector
         @part_builder = config_data.part_builder
         @scope_builder = config_data.scope_builder
+
+        @part_class = config_data.part_class
+        @part_namespace = config_data.part_namespace
+        @scope_class = config_data.scope_class
+        @scope_namespace = config_data.scope_namespace
+        @cache_key = config_data.object_id
 
         @context = context.dup_for_rendering(self)
         @renderer = Renderer.new(config_data)
