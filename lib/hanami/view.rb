@@ -22,7 +22,6 @@ module Hanami
   # @since 2.1.0
   class View
     # @api private
-    # @since 2.1.0
     def self.gem_loader
       @gem_loader ||= Zeitwerk::Loader.new.tap do |loader|
         root = File.expand_path("..", __dir__)
@@ -45,7 +44,6 @@ module Hanami
     gem_loader.setup
 
     # @api private
-    # @since 2.1.0
     DEFAULT_RENDERER_OPTIONS = {default_encoding: "utf-8"}.freeze
 
     include Dry::Equalizer(:config, :exposures)
@@ -290,7 +288,6 @@ module Hanami
     # @!endgroup
 
     # @api private
-    # @since 2.1.0
     def self.inherited(klass)
       super
 
@@ -445,7 +442,6 @@ module Hanami
     #
     # @return [Exposures]
     # @api private
-    # @since 2.1.0
     def self.exposures
       @exposures ||= Exposures.new
     end
@@ -541,7 +537,6 @@ module Hanami
     # @!endgroup
 
     # @api private
-    # @since 2.1.0
     def self.cache
       Cache
     end
@@ -574,7 +569,6 @@ module Hanami
     # @return [Exposures]
     #
     # @api private
-    # @since 2.1.0
     def exposures # rubocop:disable Style/TrivialAccessors
       @exposures
     end
@@ -611,7 +605,6 @@ module Hanami
     end
 
     # @api private
-    # @since 2.1.0
     def rendering(format: config_data.default_format, context: config_data.default_context)
       Rendering.new(config_data:, format:, context:)
     end
@@ -621,7 +614,7 @@ module Hanami
     # Frozen Data snapshot of the view's resolved configuration values.
     # Used for fast hot-path reads during rendering.
     #
-    # @since 2.3.0
+    # @api private
     attr_reader :config_data
 
     def ensure_config
