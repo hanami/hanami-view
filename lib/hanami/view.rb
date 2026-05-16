@@ -596,7 +596,7 @@ module Hanami
 
       if layout
         output = rendering.template(
-          File.join(*[config_data.layouts_dir, layout].compact),
+          layout_path(layout),
           rendering.scope(scope_class, layout_locals(locals))
         ) { output }
       end
@@ -630,6 +630,11 @@ module Hanami
           value
         end
       end
+    end
+
+    # @api private
+    def layout_path(layout)
+      File.join(*[config_data.layouts_dir, layout].compact)
     end
 
     def layout_locals(locals)
