@@ -13,7 +13,7 @@ module Hanami
       # @api private
       attr_reader :part_class, :part_namespace, :scope_class, :scope_namespace
 
-      # Stable identity for the underlying config snapshot, suitable as a cache-key component.
+      # Stable identity for the underlying config snapshot.
       #
       # @api private
       attr_reader :cache_key
