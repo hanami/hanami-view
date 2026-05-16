@@ -34,8 +34,6 @@ group :benchmarks do
   gem "actionpack"
   gem "actionview"
   gem "benchmark-ips"
-  gem "stackprof", platform: :mri
-  gem "memory_profiler"
 end
 
 group :docs do
