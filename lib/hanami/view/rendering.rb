@@ -19,7 +19,7 @@ module Hanami
       attr_reader :cache_key
 
       # @api private
-      attr_reader :context
+      attr_reader :context, :renderer
 
       # @api private
       def initialize(config_data:, format:, context:)
@@ -58,10 +58,6 @@ module Hanami
       def scope(name = nil, locals) # rubocop:disable Style/OptionalArguments
         scope_builder.(name, locals: locals, rendering: self)
       end
-
-      private
-
-      attr_reader :renderer
     end
   end
 end
