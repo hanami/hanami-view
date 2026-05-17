@@ -11,6 +11,8 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Changed
 
+- Cache the view's resolved configuration as a frozen `Data` snapshot (via dry-configurable's `#to_data`) at initialization, avoiding repeated config lookups on the rendering hot path for improved memory usage and speed. (@cllns in #276)
+
 ### Deprecated
 
 ### Removed
@@ -25,7 +27,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Fixed
 
-- Pass through all input arguments when exposure procs receive a keyword splat. (jaredcwhite in #269)
+- Pass through all input arguments when exposure procs receive a keyword splat. (@jaredcwhite in #269)
 
 [2.3.1]: https://github.com/hanami/view/compare/v2.3.0...v2.3.1
 
@@ -33,7 +35,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Fixed
 
-- Avoid warnings (from deprecated `URI::RFC3986_PARSER.extract`) in escape helper. (timriley in #267)
+- Avoid warnings (from deprecated `URI::RFC3986_PARSER.extract`) in escape helper. (@timriley in #267)
 
 [2.3.0]: https://github.com/hanami/view/compare/v2.3.0.beta2...v2.3.0
 
@@ -53,7 +55,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Fixed
 
-- Allow multiple named scopes to be built in a single rendering (via a fix to internal scope class cache keys). (swilgosz in #253)
+- Allow multiple named scopes to be built in a single rendering (via a fix to internal scope class cache keys). (@swilgosz in #253)
 
 [2.2.1]: https://github.com/hanami/view/compare/v2.2.0...v2.2.1
 
