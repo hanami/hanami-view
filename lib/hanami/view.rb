@@ -22,7 +22,6 @@ module Hanami
   # @since 2.1.0
   class View
     # @api private
-    # @since 2.1.0
     def self.gem_loader
       @gem_loader ||= Zeitwerk::Loader.new.tap do |loader|
         root = File.expand_path("..", __dir__)
@@ -45,7 +44,6 @@ module Hanami
     gem_loader.setup
 
     # @api private
-    # @since 2.1.0
     DEFAULT_RENDERER_OPTIONS = {default_encoding: "utf-8"}.freeze
 
     include Dry::Equalizer(:config, :exposures)
@@ -290,7 +288,6 @@ module Hanami
     # @!endgroup
 
     # @api private
-    # @since 2.1.0
     def self.inherited(klass)
       super
 
@@ -445,7 +442,6 @@ module Hanami
     #
     # @return [Exposures]
     # @api private
-    # @since 2.1.0
     def self.exposures
       @exposures ||= Exposures.new
     end
@@ -541,13 +537,6 @@ module Hanami
     # @!endgroup
 
     # @api private
-    # @since 2.1.0
-    def self.layout_path(layout)
-      File.join(*[config.layouts_dir, layout].compact)
-    end
-
-    # @api private
-    # @since 2.1.0
     def self.cache
       Cache
     end
@@ -563,6 +552,7 @@ module Hanami
       self.class.config.finalize!
       ensure_config
 
+      @config_data = config.to_data
       @exposures = self.class.exposures.bind(self)
     end
 
@@ -579,7 +569,6 @@ module Hanami
     # @return [Exposures]
     #
     # @api private
-    # @since 2.1.0
     def exposures # rubocop:disable Style/TrivialAccessors
       @exposures
     end
@@ -595,16 +584,20 @@ module Hanami
     #
     # @api public
     # @since 2.1.0
-    def call(format: config.default_format, context: config.default_context, layout: config.layout, **input)
+    def call(format: config_data.default_format,
+             context: config_data.default_context,
+             layout: config_data.layout,
+             **input)
       rendering = self.rendering(format: format, context: context)
+      scope_class = config_data.scope
 
       locals = locals(rendering, input)
-      output = rendering.template(config.template, rendering.scope(config.scope, locals))
+      output = rendering.template(config_data.template, rendering.scope(scope_class, locals))
 
       if layout
         output = rendering.template(
-          self.class.layout_path(layout),
-          rendering.scope(config.scope, layout_locals(locals))
+          layout_path(layout),
+          rendering.scope(scope_class, layout_locals(locals))
         ) { output }
       end
 
@@ -612,12 +605,17 @@ module Hanami
     end
 
     # @api private
-    # @since 2.1.0
-    def rendering(format: config.default_format, context: config.default_context)
-      Rendering.new(config: config, format: format, context: context)
+    def rendering(format: config_data.default_format, context: config_data.default_context)
+      Rendering.new(config_data:, format:, context:)
     end
 
     private
+
+    # Frozen Data snapshot of the view's resolved configuration values.
+    # Used for fast hot-path reads during rendering.
+    #
+    # @api private
+    attr_reader :config_data
 
     def ensure_config
       raise UndefinedConfigError, :paths unless Array(config.paths).any?
@@ -626,12 +624,17 @@ module Hanami
 
     def locals(rendering, input)
       exposures.(context: rendering.context, **input) do |value, exposure|
-        if exposure.decorate?(default: config.decorate_exposures) && value
+        if exposure.decorate?(default: config_data.decorate_exposures) && value
           rendering.part(exposure.name, value, as: exposure.options[:as])
         else
           value
         end
       end
+    end
+
+    # @api private
+    def layout_path(layout)
+      File.join(*[config_data.layouts_dir, layout].compact)
     end
 
     def layout_locals(locals)

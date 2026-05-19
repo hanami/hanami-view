@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe Hanami::View::Renderer do
-  subject(:renderer) { Hanami::View::Renderer.new(view_class.config) }
+  subject(:renderer) { Hanami::View::Renderer.new(config_data) }
+
+  let(:config_data) { view_class.config.to_data }
 
   let(:view_class) {
     Class.new(Hanami::View) {

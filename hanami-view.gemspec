@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 3.3"
 
-  spec.add_runtime_dependency "dry-configurable", "~> 1.0"
+  spec.add_runtime_dependency "dry-configurable", "~> 1.4"
   spec.add_runtime_dependency "dry-core", "~> 1.0"
   spec.add_runtime_dependency "dry-inflector", "~> 1.0", "< 2"
   spec.add_runtime_dependency "temple", "~> 0.10.0", ">= 0.10.2"

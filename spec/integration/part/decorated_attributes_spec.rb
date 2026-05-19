@@ -60,7 +60,7 @@ RSpec.describe "Part / Decorated attributes" do
 
   let(:rendering) {
     Hanami::View::Rendering.new(
-      config: view.config,
+      config_data: view.config.to_data,
       format: :html,
       context: Hanami::View::Context.new
     )
@@ -71,6 +71,7 @@ RSpec.describe "Part / Decorated attributes" do
 
     Class.new(Hanami::View) {
       config.part_builder = part_builder if part_builder
+      finalize!
     }
   }
 
