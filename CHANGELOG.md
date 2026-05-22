@@ -9,7 +9,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Added
 
-- Track the currently-rendering template name. `Hanami::View::Rendering` exposes `#current_template_name` (the topmost entry) and `#current_template_names` (the full stack), pushed and popped around every `#template` and `#partial` call. Partial entries use the lookup name without the leading underscore (e.g. `"users/form"`, not `"users/_form"`). Convenience accessors are available as `Hanami::View::Scope#_template_name` (with `template_name` as a convenience alias) and `Hanami::View::Context#current_template_name`. The current template name can be used to enable such behaviors as lazy/relative key lookups for i18n view helpers. (@timriley)
+- Track the currently-rendering template name. `Hanami::View::Rendering` exposes `#current_template_name` (the topmost entry) and `#current_template_names` (the full stack), pushed and popped around every `#template` and `#partial` call. Entries are the resolved path of the file actually being rendered, relative to its configured `paths` directory, with format/engine extensions stripped and a leading underscore stripped from partial basenames. For example, `render("form")` from inside `posts/show.html.erb` reports `"posts/form"` (not `"form"`); a layout at `layouts/app.html.erb` reports `"layouts/app"`. Convenience accessors are available as `Hanami::View::Scope#_template_name` (with `template_name` as a convenience alias) and `Hanami::View::Context#current_template_name`. The current template name can be used to enable such behaviors as lazy/relative key lookups for i18n view helpers. (@timriley in #277)
 
 ### Changed
 

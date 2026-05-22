@@ -16,12 +16,6 @@ module Hanami
 
       attr_reader :context, :renderer
 
-      # Stack of names for the templates and partials currently being rendered. The top of the stack
-      # is the innermost render in progress.
-      #
-      # @return [Array<String>]
-      attr_reader :current_template_names
-
       def initialize(config_data:, format:, context:)
         @format = format
 
@@ -37,32 +31,36 @@ module Hanami
 
         @context = context.dup_for_rendering(self)
         @renderer = Renderer.new(config_data)
-        @current_template_names = []
       end
 
-      # Returns the name of the template or partial currently being rendered, or nil if no render
-      # is in progress.
-      #
-      # For partials, this is the lookup name without the leading underscore (e.g. `"users/form"`,
-      # not `"users/_form"`).
+      # Returns the resolved name of the template or partial currently being rendered, or nil if
+      # no render is in progress.
       #
       # @return [String, nil]
+      #
+      # @api public
+      # @since x.x.x
       def current_template_name
-        @current_template_names.last
+        renderer.current_template_name
+      end
+
+      # Returns the stack of resolved names for the templates and partials currently being
+      # rendered.
+      #
+      # @return [Array<String>]
+      #
+      # @api private
+      # @since x.x.x
+      def current_template_names
+        renderer.current_template_names
       end
 
       def template(name, scope, &block)
-        @current_template_names.push(name.to_s)
         renderer.template(name, format, scope, &block)
-      ensure
-        @current_template_names.pop
       end
 
       def partial(name, scope, &block)
-        @current_template_names.push(name.to_s)
         renderer.partial(name, format, scope, &block)
-      ensure
-        @current_template_names.pop
       end
 
       def part(name, value, as: nil)
