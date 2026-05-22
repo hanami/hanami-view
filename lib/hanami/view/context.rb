@@ -40,6 +40,17 @@ module Hanami
           obj.instance_variable_set(:@_rendering, rendering)
         end
       end
+
+      # Returns the name of the template or partial currently being rendered, or nil if no render is
+      # in progress.
+      #
+      # @return [String, nil]
+      #
+      # @api public
+      # @since x.x.x
+      def current_template_name
+        _rendering.current_template_name
+      end
     end
   end
 end

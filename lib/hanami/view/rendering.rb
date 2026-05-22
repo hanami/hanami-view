@@ -7,21 +7,15 @@ module Hanami
       # @api private
       attr_reader :format
 
-      # @api private
       attr_reader :inflector, :part_builder, :scope_builder
 
-      # @api private
       attr_reader :part_class, :part_namespace, :scope_class, :scope_namespace
 
       # Stable identity for the underlying config snapshot.
-      #
-      # @api private
       attr_reader :cache_key
 
-      # @api private
       attr_reader :context, :renderer
 
-      # @api private
       def initialize(config_data:, format:, context:)
         @format = format
 
@@ -39,22 +33,40 @@ module Hanami
         @renderer = Renderer.new(config_data)
       end
 
+      # Returns the resolved name of the template or partial currently being rendered, or nil if
+      # no render is in progress.
+      #
+      # @return [String, nil]
+      #
+      # @api public
+      # @since x.x.x
+      def current_template_name
+        renderer.current_template_name
+      end
+
+      # Returns the stack of resolved names for the templates and partials currently being
+      # rendered.
+      #
+      # @return [Array<String>]
+      #
       # @api private
+      # @since x.x.x
+      def current_template_names
+        renderer.current_template_names
+      end
+
       def template(name, scope, &block)
         renderer.template(name, format, scope, &block)
       end
 
-      # @api private
       def partial(name, scope, &block)
         renderer.partial(name, format, scope, &block)
       end
 
-      # @api private
       def part(name, value, as: nil)
         part_builder.(name, value, as: as, rendering: self)
       end
 
-      # @api private
       def scope(name = nil, locals) # rubocop:disable Style/OptionalArguments
         scope_builder.(name, locals: locals, rendering: self)
       end

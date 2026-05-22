@@ -35,6 +35,23 @@ RSpec.describe Hanami::View::Context do
     end
   end
 
+  describe "#current_template_name" do
+    let(:context) { Hanami::View::Context.new.dup_for_rendering(rendering) }
+
+    it "delegates to the rendering" do
+      allow(rendering).to receive(:current_template_name).and_return("users/index")
+      expect(context.current_template_name).to eq "users/index"
+    end
+
+    context "without a rendering" do
+      let(:context) { Hanami::View::Context.new }
+
+      it "returns nil" do
+        expect(context.current_template_name).to be_nil
+      end
+    end
+  end
+
   describe "decorated attributes" do
     subject(:context) { context_class.new(assets: assets) }
 

@@ -41,4 +41,84 @@ RSpec.describe Hanami::View::Renderer do
       }.to raise_error(Hanami::View::TemplateNotFoundError, /_missing_partial/)
     end
   end
+
+  describe "#current_template_name" do
+    it "is nil before any render" do
+      expect(renderer.current_template_name).to be_nil
+    end
+
+    it "exposes the resolved template name during a template render" do
+      captured = nil
+      allow(renderer).to receive(:render).and_wrap_original do |original, *args, &block|
+        captured = renderer.current_template_name
+        original.call(*args, &block)
+      end
+
+      renderer.template("hello", :html, scope)
+
+      expect(captured).to eq("hello")
+    end
+
+    it "exposes the resolved partial name during a partial render" do
+      captured = nil
+      allow(renderer).to receive(:render).and_wrap_original do |original, *args, &block|
+        captured = renderer.current_template_name
+        original.call(*args, &block)
+      end
+
+      renderer.partial("hello", :html, scope)
+
+      expect(captured).to eq("_hello")
+    end
+
+    it "exposes the resolved partial name including its directory when partial is in a subdirectory" do
+      captured = nil
+      allow(renderer).to receive(:render).and_wrap_original do |original, *args, &block|
+        captured = renderer.current_template_name
+        original.call(*args, &block)
+      end
+
+      renderer.partial("shared/shared_hello", :html, scope)
+
+      expect(captured).to eq("shared/_shared_hello")
+    end
+
+    it "is restored to nil after a template render completes" do
+      renderer.template("hello", :html, scope)
+      expect(renderer.current_template_name).to be_nil
+    end
+
+    it "is restored even if rendering raises" do
+      allow(renderer).to receive(:render).and_raise("boom")
+
+      expect { renderer.template("hello", :html, scope) }.to raise_error("boom")
+      expect(renderer.current_template_name).to be_nil
+    end
+
+    it "is unchanged when a lookup miss raises TemplateNotFoundError" do
+      expect {
+        renderer.template("missing", :html, scope)
+      }.to raise_error(Hanami::View::TemplateNotFoundError)
+      expect(renderer.current_template_name).to be_nil
+    end
+  end
+
+  describe "#current_template_names" do
+    it "is empty before any render" do
+      expect(renderer.current_template_names).to eq([])
+    end
+
+    it "holds a single entry during a flat render" do
+      captured = nil
+      allow(renderer).to receive(:render).and_wrap_original do |original, *args, &block|
+        captured = renderer.current_template_names.dup
+        original.call(*args, &block)
+      end
+
+      renderer.template("hello", :html, scope)
+
+      expect(captured).to eq(["hello"])
+      expect(renderer.current_template_names).to eq([])
+    end
+  end
 end
