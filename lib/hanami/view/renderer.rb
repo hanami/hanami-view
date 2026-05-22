@@ -49,9 +49,8 @@ module Hanami
       # Returns the resolved name of the template or partial currently being rendered, or nil if no
       # render is in progress.
       #
-      # For partials, this is the file's path relative to its configured `paths` directory, without
-      # extensions and without the leading underscore on the basename (e.g. `"posts/form"`, not
-      # `"posts/_form"`).
+      # The name is the file's path relative to the matching view path, with format/engine
+      # extensions stripped.
       #
       # @return [String, nil]
       def current_template_name
@@ -111,15 +110,12 @@ module Hanami
       # Derives the rendered template's name from its relative path, suitable for tracking on
       # `@current_template_names` and surfacing via `#current_template_name`.
       #
-      # Strips format/engine extensions (e.g. `.html.erb`) and a leading underscore from the
-      # basename, so partials report `"posts/form"` rather than `"posts/_form.html.erb"`.
+      # Strips format/engine extensions (e.g. `.html.erb`), so `"posts/_form.html.erb"` becomes
+      # `"posts/_form"`.
       #
       # @return [String]
       def resolve_template_name(relative_path)
-        name = relative_path.sub(EXTENSIONS_REGEXP, "")
-        segments = name.split(PATH_DELIMITER)
-        segments[-1] = segments[-1].delete_prefix(PARTIAL_PREFIX)
-        segments.join(PATH_DELIMITER)
+        relative_path.sub(EXTENSIONS_REGEXP, "")
       end
 
       def name_for_partial(name)

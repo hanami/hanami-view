@@ -44,8 +44,6 @@ module Hanami
       # Returns the name of the template or partial currently being rendered, or nil if no render is
       # in progress.
       #
-      # For partials, this is the lookup name without the leading underscore.
-      #
       # @return [String, nil]
       #
       # @api public

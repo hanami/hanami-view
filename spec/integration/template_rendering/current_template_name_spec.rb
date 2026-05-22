@@ -51,13 +51,13 @@ RSpec.describe "Template rendering / Current template name" do
     expect(build_view(template: "show").call(context:).to_s).to eq "show"
   end
 
-  it "reports the partial's name (without leading underscore) inside a partial" do
+  it "reports the partial's file name inside a partial" do
     with_directory(dir) do
       write "show.html.erb", "<%= render('form') %>"
       write "_form.html.erb", "in:<%= template_name %>"
     end
 
-    expect(build_view(template: "show").call(context:).to_s).to eq "in:form"
+    expect(build_view(template: "show").call(context:).to_s).to eq "in:_form"
   end
 
   it "reports the partial's resolved path (not just its lookup name)" do
@@ -67,7 +67,7 @@ RSpec.describe "Template rendering / Current template name" do
       File.write(File.join(dir, "posts", "_form.html.erb"), "in:<%= template_name %>")
     end
 
-    expect(build_view(template: "posts/show").call(context:).to_s).to eq "in:posts/form"
+    expect(build_view(template: "posts/show").call(context:).to_s).to eq "in:posts/_form"
   end
 
   it "preserves explicit qualified partial paths" do
@@ -77,7 +77,7 @@ RSpec.describe "Template rendering / Current template name" do
       File.write(File.join(dir, "shared", "_form.html.erb"), "in:<%= template_name %>")
     end
 
-    expect(build_view(template: "show").call(context:).to_s).to eq "in:shared/form"
+    expect(build_view(template: "show").call(context:).to_s).to eq "in:shared/_form"
   end
 
   it "reports the layout's name from inside the layout" do
@@ -107,8 +107,8 @@ RSpec.describe "Template rendering / Current template name" do
 
     expect(context.captures).to eq([
       [:show, ["show"]],
-      [:outer, ["show", "outer"]],
-      [:inner, ["show", "outer", "inner"]]
+      [:outer, ["show", "_outer"]],
+      [:inner, ["show", "_outer", "_inner"]]
     ])
   end
 
@@ -124,7 +124,7 @@ RSpec.describe "Template rendering / Current template name" do
 
     expect(context.captures).to eq([
       [:before, "show"],
-      [:in, "form"],
+      [:in, "_form"],
       [:after, "show"]
     ])
   end

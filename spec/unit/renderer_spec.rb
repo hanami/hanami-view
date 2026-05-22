@@ -59,7 +59,7 @@ RSpec.describe Hanami::View::Renderer do
       expect(captured).to eq("hello")
     end
 
-    it "exposes the resolved partial name (without leading underscore) during a partial render" do
+    it "exposes the resolved partial name during a partial render" do
       captured = nil
       allow(renderer).to receive(:render).and_wrap_original do |original, *args, &block|
         captured = renderer.current_template_name
@@ -68,7 +68,7 @@ RSpec.describe Hanami::View::Renderer do
 
       renderer.partial("hello", :html, scope)
 
-      expect(captured).to eq("hello")
+      expect(captured).to eq("_hello")
     end
 
     it "exposes the resolved partial name including its directory when partial is in a subdirectory" do
@@ -80,7 +80,7 @@ RSpec.describe Hanami::View::Renderer do
 
       renderer.partial("shared/shared_hello", :html, scope)
 
-      expect(captured).to eq("shared/shared_hello")
+      expect(captured).to eq("shared/_shared_hello")
     end
 
     it "is restored to nil after a template render completes" do

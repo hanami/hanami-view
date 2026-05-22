@@ -148,8 +148,6 @@ module Hanami
 
       # Returns the name of the template or partial currently being rendered.
       #
-      # For partials, this is the lookup name without the leading underscore.
-      #
       # @overload _template_name
       #   Returns the current template name.
       #   @return [String, nil]
