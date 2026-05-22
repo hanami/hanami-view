@@ -9,6 +9,8 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Added
 
+- Track the currently-rendering template name. `Hanami::View::Rendering` exposes `#current_template_name` (the topmost entry) and `#current_template_names` (the full stack), pushed and popped around every `#template` and `#partial` call. Partial entries use the lookup name without the leading underscore (e.g. `"users/form"`, not `"users/_form"`). Convenience accessors are available as `Hanami::View::Scope#_template_name` (with `template_name` as a convenience alias) and `Hanami::View::Context#current_template_name`. The current template name can be used to enable such behaviors as lazy/relative key lookups for i18n view helpers. (@timriley)
+
 ### Changed
 
 - Cache the view's resolved configuration as a frozen `Data` snapshot (via dry-configurable's `#to_data`) at initialization, avoiding repeated config lookups on the rendering hot path for improved memory usage and speed. (@cllns in #276)

@@ -7,21 +7,21 @@ module Hanami
       # @api private
       attr_reader :format
 
-      # @api private
       attr_reader :inflector, :part_builder, :scope_builder
 
-      # @api private
       attr_reader :part_class, :part_namespace, :scope_class, :scope_namespace
 
       # Stable identity for the underlying config snapshot.
-      #
-      # @api private
       attr_reader :cache_key
 
-      # @api private
       attr_reader :context, :renderer
 
-      # @api private
+      # Stack of names for the templates and partials currently being rendered. The top of the stack
+      # is the innermost render in progress.
+      #
+      # @return [Array<String>]
+      attr_reader :current_template_names
+
       def initialize(config_data:, format:, context:)
         @format = format
 
@@ -37,24 +37,38 @@ module Hanami
 
         @context = context.dup_for_rendering(self)
         @renderer = Renderer.new(config_data)
+        @current_template_names = []
       end
 
-      # @api private
+      # Returns the name of the template or partial currently being rendered, or nil if no render
+      # is in progress.
+      #
+      # For partials, this is the lookup name without the leading underscore (e.g. `"users/form"`,
+      # not `"users/_form"`).
+      #
+      # @return [String, nil]
+      def current_template_name
+        @current_template_names.last
+      end
+
       def template(name, scope, &block)
+        @current_template_names.push(name.to_s)
         renderer.template(name, format, scope, &block)
+      ensure
+        @current_template_names.pop
       end
 
-      # @api private
       def partial(name, scope, &block)
+        @current_template_names.push(name.to_s)
         renderer.partial(name, format, scope, &block)
+      ensure
+        @current_template_names.pop
       end
 
-      # @api private
       def part(name, value, as: nil)
         part_builder.(name, value, as: as, rendering: self)
       end
 
-      # @api private
       def scope(name = nil, locals) # rubocop:disable Style/OptionalArguments
         scope_builder.(name, locals: locals, rendering: self)
       end

@@ -19,7 +19,7 @@ module Hanami
     # @since 2.1.0
     class Scope
       # @api private
-      CONVENIENCE_METHODS = %i[format context locals].freeze
+      CONVENIENCE_METHODS = %i[format context locals template_name].freeze
 
       include Dry::Equalizer(:_name, :_locals, :_rendering)
 
@@ -35,10 +35,10 @@ module Hanami
       #
       # @overload _locals
       #   Returns the locals.
+      #   @return [Hash{Symbol => Object}]
       # @overload locals
       #   A convenience alias for `#_locals.` Is available unless there is a local named `locals`
-      #
-      # @return [Hash[<Symbol, Object>]
+      #   @return [Hash{Symbol => Object}]
       #
       # @api public
       # @since 2.1.0
@@ -76,16 +76,16 @@ module Hanami
       #   Renders a partial using the scope.
       #
       #   @param partial_name [Symbol, String] partial name
-      #   @param locals [Hash<Symbol, Object>] partial locals
+      #   @param locals [Hash{Symbol => Object}] partial locals
       #   @yieldreturn [String] string content to include where the partial calls `yield`
+      #   @return [String] the rendered partial output
       #
       # @overload render(**locals, &block)
       #   Renders a partial (named after the scope's own name) using the scope.
       #
-      #   @param locals[Hash<Symbol, Object>] partial locals
+      #   @param locals [Hash{Symbol => Object}] partial locals
       #   @yieldreturn [String] string content to include where the partial calls `yield`
-      #
-      # @return [String] the rendered partial output
+      #   @return [String] the rendered partial output
       #
       # @api public
       # @since 2.1.0
@@ -120,11 +120,10 @@ module Hanami
       #
       # @overload _format
       #   Returns the format.
+      #   @return [Symbol] format
       # @overload format
-      #   A convenience alias for `#_format.` Is available unless there is a
-      #   local named `format`
-      #
-      # @return [Symbol] format
+      #   A convenience alias for `#_format.` Is available unless there is a local named `format`.
+      #   @return [Symbol] format
       #
       # @api public
       # @since 2.1.0
@@ -136,16 +135,33 @@ module Hanami
       #
       # @overload _context
       #   Returns the context.
+      #   @return [Context] context
       # @overload context
-      #   A convenience alias for `#_context`. Is available unless there is a
-      #   local named `context`.
-      #
-      # @return [Context] context
+      #   A convenience alias for `#_context`. Is available unless there is a local named `context`.
+      #   @return [Context] context
       #
       # @api public
       # @since 2.1.0
       def _context
         _rendering.context
+      end
+
+      # Returns the name of the template or partial currently being rendered.
+      #
+      # For partials, this is the lookup name without the leading underscore.
+      #
+      # @overload _template_name
+      #   Returns the current template name.
+      #   @return [String, nil]
+      # @overload template_name
+      #   A convenience alias for `#_template_name`. Is available unless there is a local named
+      #   `template_name`.
+      #   @return [String, nil]
+      #
+      # @api public
+      # @since x.x.x
+      def _template_name
+        _rendering.current_template_name
       end
 
       private

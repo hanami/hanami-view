@@ -53,6 +53,13 @@ RSpec.describe Hanami::View::Scope do
       end
     end
 
+    describe "#_template_name" do
+      it "returns the rendering's current template name" do
+        allow(rendering).to receive(:current_template_name).and_return("users/index")
+        expect(scope._template_name).to eq "users/index"
+      end
+    end
+
     describe "#method_missing" do
       describe "matching locals" do
         let(:locals) { {greeting: "hello from locals"} }
@@ -86,6 +93,11 @@ RSpec.describe Hanami::View::Scope do
         it "provides #locals" do
           expect(scope.locals).to be locals
         end
+
+        it "provides #template_name" do
+          allow(rendering).to receive(:current_template_name).and_return("users/index")
+          expect(scope.template_name).to eq "users/index"
+        end
       end
 
       describe "no matches" do
@@ -116,6 +128,12 @@ RSpec.describe Hanami::View::Scope do
     describe "#_context" do
       it "raises an error" do
         expect { scope._context }.to raise_error(Hanami::View::RenderingMissingError)
+      end
+    end
+
+    describe "#_template_name" do
+      it "returns nil" do
+        expect(scope._template_name).to be_nil
       end
     end
   end
