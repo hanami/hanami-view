@@ -9,7 +9,7 @@ gemspec:
   summary: "A complete, standalone view rendering system that gives you everything you need to write well-factored view code"
   homepage: "https://hanamirb.org"
   runtime_dependencies:
-    - ["dry-configurable", "~> 1.0"]
+    - ["dry-configurable", "~> 1.4"]
     - ["dry-core", "~> 1.0"]
     - ["dry-inflector", "~> 1.0", "< 2"]
     - ["temple", "~> 0.10.0", ">= 0.10.2"]
