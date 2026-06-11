@@ -9,11 +9,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Added
 
-- Track the currently-rendering template name. `Hanami::View::Rendering` exposes `#current_template_name` (the topmost entry) and `#current_template_names` (the full stack), pushed and popped around every `#template` and `#partial` call. Entries are the resolved path of the file actually being rendered, relative to its configured `paths` directory, with format/engine extensions stripped. For example, `render("form")` from inside `posts/show.html.erb` reports `"posts/_form"` (not `"form"`); a layout at `layouts/app.html.erb` reports `"layouts/app"`. Convenience accessors are available as `Hanami::View::Scope#_template_name` (with `template_name` as a convenience alias) and `Hanami::View::Context#current_template_name`. The current template name can be used to enable such behaviors as lazy/relative key lookups for i18n view helpers. (@timriley in #277)
-
 ### Changed
-
-- Cache the view's resolved configuration as a frozen `Data` snapshot (via dry-configurable's `#to_data`) at initialization, avoiding repeated config lookups on the rendering hot path for improved memory usage and speed. (@cllns in #276)
 
 ### Deprecated
 
@@ -23,7 +19,27 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Security
 
-[Unreleased]: https://github.com/hanami/view/compare/v2.3.1...HEAD
+[Unreleased]: https://github.com/hanami/view/compare/v3.0.0.rc1...HEAD
+
+## [3.0.0.rc1]
+
+### Added
+
+- Track the currently-rendering template name. (@timriley in #277)
+
+    Expose the topmost entry as `Hanami::View::Rendering#current_template_name` and the full stack as `#current_template_names`. Entries are the resolved path of the file actually being rendered, relative to its configured `paths` directory, with format/engine extensions stripped. For example, `render("form")` from inside `posts/show.html.erb` reports `"posts/_form"`; a layout at `layouts/app.html.erb` reports `"layouts/app"`.
+
+    Convenience accessors are available as `Hanami::View::Scope#_template_name` (with `template_name` as a convenience alias) and `Hanami::View::Context#current_template_name`. The current template name can be used to enable such behaviors as lazy/relative key lookups for i18n view helpers. 
+
+### Changed
+
+- **BREAKING:** Default to undecorated exposures. (@timriley in #274)
+
+    Decorate your exposures with the new `.decorate` method, or the `decorate: true` option for `.expose`. Default back to decorated exposures via `config.decorate_exposures = true`. 
+- Cache the view's resolved configuration as a frozen `Data` snapshot (via dry-configurable's `#to_data`) at initialization, avoiding repeated config lookups on the rendering hot path for improved memory usage and speed. (@cllns in #276)
+- Require Ruby 3.3 or newer.
+
+[3.0.0.rc1]: https://github.com/hanami/view/compare/v2.3.1...v3.0.0.rc1
 
 ## [2.3.1] - 2025-11-22
 
