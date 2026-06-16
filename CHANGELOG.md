@@ -21,7 +21,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 [Unreleased]: https://github.com/hanami/view/compare/v3.0.0.rc1...HEAD
 
-## [3.0.0.rc1]
+## [3.0.0.rc1] - 2026-06-16
 
 ### Added
 
