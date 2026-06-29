@@ -41,6 +41,11 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 - Cache the view's resolved configuration as a frozen `Data` snapshot (via dry-configurable's `#to_data`) at initialization, avoiding repeated config lookups on the rendering hot path for improved memory usage and speed. (@cllns in #276)
 - Require Ruby 3.3 or newer.
 
+### Fixed
+
+- Allow the gem to be eager loaded by Zeitwerk when the optional haml and slim gems are not installed. (@timriley in #279)
+- Use our own Haml template engine even when the haml gem is required before hanami-view. (@timriley in #279)
+
 [3.0.0]: https://github.com/hanami/view/compare/v2.3.1...v3.0.0
 
 ## [3.0.0.rc1] - 2026-06-16

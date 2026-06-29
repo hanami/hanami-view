@@ -10,14 +10,24 @@ module Hanami
       # @api private
       # @since 2.1.0
       Mapping = ::Tilt.default_mapping.dup.tap { |mapping|
-        # If "slim" has been required before "hanami/view", unregister Slim's non-lazy registered
-        # template, so our own template adapter (using register_lazy below) can take precedence.
-        mapping.unregister "slim"
+        # Unregister any existing mappings for the extensions we provide our own engines for.
+        #
+        # Tilt preferences non-lazy registrations over lazy ones (see `Tilt::Mapping#lookup`). So if
+        # "haml" or "slim" has been required before this mapping is built (each of which registers
+        # its own non-lazy mapping with Tilt), our own lazy-registered adapters below would be
+        # shadowed and never picked up, and templates would render without our specific required
+        # behavior.
+        #
+        # Unregistering first ensures our engines are always used, regardless of load order.
+        mapping.unregister "erb", "rhtml", "haml", "slim"
 
         # Register our own ERB template.
         mapping.register_lazy "Hanami::View::ERB::Template", "hanami/view/erb/template", "erb", "rhtml"
 
-        # Register ERB templates for Haml and Slim that set the `use_html_safe: true` option.
+        # Register templates for Haml and Slim that set the `use_html_safe: true` option.
+        #
+        # We register these lazily so that the optional "haml" and "slim" gems only need to be
+        # installed when their templates are actually used.
         #
         # Our template namespaces below have the "Adapter" suffix to work around a bug in Tilt's
         # `Mapping#const_defined?`, which (if slim was already required) would receive
