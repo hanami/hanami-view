@@ -21,15 +21,39 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 [Unreleased]: https://github.com/hanami/view/compare/v3.0.0.rc1...HEAD
 
+## [3.0.0]
+
+### Added
+
+- Track the currently-rendering template name. (@timriley in #277)
+
+    Expose this as `Hanami::View::Scope#_template_name` (with `template_name` as a convenience alias) and `Hanami::View::Context#current_template_name`.
+
+    The name is resolved path of the file actually being rendered, relative to its configured `paths` directory, with format/engine extensions stripped. For example, `render("form")` from inside `posts/show.html.erb` returns `"posts/_form"`; a layout at `layouts/app.html.erb` returns `"layouts/app"`.
+
+    The current template name can be used to enable such behaviors as lazy/relative key lookups for i18n view helpers. 
+
+### Changed
+
+- **BREAKING:** Default to undecorated exposures. (@timriley in #274)
+
+    Decorate your exposures with the new `.decorate` method, or the `decorate: true` option for `.expose`. Default back to decorated exposures via `config.decorate_exposures = true`. 
+- Cache the view's resolved configuration as a frozen `Data` snapshot (via dry-configurable's `#to_data`) at initialization, avoiding repeated config lookups on the rendering hot path for improved memory usage and speed. (@cllns in #276)
+- Require Ruby 3.3 or newer.
+
+[3.0.0]: https://github.com/hanami/view/compare/v2.3.1...v3.0.0
+
 ## [3.0.0.rc1] - 2026-06-16
 
 ### Added
 
 - Track the currently-rendering template name. (@timriley in #277)
 
-    Expose the topmost entry as `Hanami::View::Rendering#current_template_name` and the full stack as `#current_template_names`. Entries are the resolved path of the file actually being rendered, relative to its configured `paths` directory, with format/engine extensions stripped. For example, `render("form")` from inside `posts/show.html.erb` reports `"posts/_form"`; a layout at `layouts/app.html.erb` reports `"layouts/app"`.
+    Expose this as `Hanami::View::Scope#_template_name` (with `template_name` as a convenience alias) and `Hanami::View::Context#current_template_name`.
 
-    Convenience accessors are available as `Hanami::View::Scope#_template_name` (with `template_name` as a convenience alias) and `Hanami::View::Context#current_template_name`. The current template name can be used to enable such behaviors as lazy/relative key lookups for i18n view helpers. 
+    The name is resolved path of the file actually being rendered, relative to its configured `paths` directory, with format/engine extensions stripped. For example, `render("form")` from inside `posts/show.html.erb` returns `"posts/_form"`; a layout at `layouts/app.html.erb` returns `"layouts/app"`.
+
+    The current template name can be used to enable such behaviors as lazy/relative key lookups for i18n view helpers. 
 
 ### Changed
 
