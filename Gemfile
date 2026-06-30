@@ -6,6 +6,12 @@ eval_gemfile "Gemfile.devtools"
 
 gemspec
 
+# Work around RDoc/JRuby incompatibiltiy: rdoc 8 depends on rbs 4, whose native C extension can't
+# build on JRuby.
+#
+# Remove this once https://github.com/ruby/rdoc/issues/1746 is resolved.
+gem "rdoc", "< 8.0"
+
 group :tools do
   # Remove hotch until https://github.com/ko1/allocation_tracer/issues/19 is fixed and it can be
   # installed on macOS again.
