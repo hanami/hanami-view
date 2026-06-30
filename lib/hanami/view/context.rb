@@ -47,7 +47,7 @@ module Hanami
       # @return [String, nil]
       #
       # @api public
-      # @since x.x.x
+      # @since 3.0.0
       def current_template_name
         _rendering.current_template_name
       end

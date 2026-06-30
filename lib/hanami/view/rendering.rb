@@ -37,9 +37,6 @@ module Hanami
       # no render is in progress.
       #
       # @return [String, nil]
-      #
-      # @api public
-      # @since x.x.x
       def current_template_name
         renderer.current_template_name
       end
@@ -48,9 +45,6 @@ module Hanami
       # rendered.
       #
       # @return [Array<String>]
-      #
-      # @api private
-      # @since x.x.x
       def current_template_names
         renderer.current_template_names
       end

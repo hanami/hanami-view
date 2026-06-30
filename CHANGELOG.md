@@ -19,9 +19,9 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Security
 
-[Unreleased]: https://github.com/hanami/view/compare/v3.0.0.rc1...HEAD
+[Unreleased]: https://github.com/hanami/view/compare/v3.0.0...HEAD
 
-## [3.0.0]
+## [3.0.0] - 2026-06-30
 
 ### Added
 

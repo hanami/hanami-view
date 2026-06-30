@@ -251,7 +251,7 @@ module Hanami
     #
     #   @param value [Boolean] whether to decorate exposures by default
     #   @api public
-    #   @since x.x.x
+    #   @since 3.0.0
     # @!scope class
     setting :decorate_exposures, default: false
 
