@@ -30,7 +30,12 @@ module Hanami
         loader.ignore(
           "#{root}/hanami-view.rb",
           "#{root}/hanami/view/version.rb",
-          "#{root}/hanami/view/errors.rb"
+          "#{root}/hanami/view/errors.rb",
+          # These adapters require the optional "haml" and "slim" gems. They are loaded lazily by
+          # Tilt (see Hanami::View::Tilt) only when their respective template engines are used;
+          # ignore them here to allow eager loading without those gems installed.
+          "#{root}/hanami/view/tilt/haml_adapter.rb",
+          "#{root}/hanami/view/tilt/slim_adapter.rb"
         )
         loader.inflector = Zeitwerk::GemInflector.new("#{root}/hanami-view.rb")
         loader.inflector.inflect(

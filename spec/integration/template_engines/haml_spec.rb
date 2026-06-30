@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# This adapter is ignored by our Zeitwerk loader, since it requires the optional "haml" gem. Load it
+# explicitly for these tests.
+require "hanami/view/tilt/haml_adapter"
+
 RSpec.describe "Template engines / haml" do
   let(:base_view) {
     Class.new(Hanami::View) do
