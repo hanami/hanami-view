@@ -112,6 +112,34 @@ RSpec.describe "Template rendering / Current template name" do
     ])
   end
 
+  it "reports the calling template's name inside a block yielded to a partial" do
+    with_directory(dir) do
+      write "show.html.erb", "<%= render('wrapper') do %>[<%= template_name %>]<% end %>"
+      write "_wrapper.html.erb", "(<%= template_name %>|<%= yield %>)"
+    end
+
+    expect(build_view(template: "show").call(context:).to_s).to eq "(_wrapper|[show])"
+  end
+
+  it "reports the calling template's name inside a block yielded through nested partials" do
+    with_directory(dir) do
+      write "show.html.erb", "<%= render('outer') %>"
+      write "_outer.html.erb", "<%= render('inner') do %>[<%= template_name %>]<% end %>"
+      write "_inner.html.erb", "(<%= template_name %>|<%= yield %>)"
+    end
+
+    expect(build_view(template: "show").call(context:).to_s).to eq "(_inner|[_outer])"
+  end
+
+  it "restores the yielding template's name after a yielded block returns" do
+    with_directory(dir) do
+      write "show.html.erb", "<%= render('wrapper') do %>B:<%= template_name %><% end %>"
+      write "_wrapper.html.erb", "1:<%= template_name %>|<%= yield %>|2:<%= template_name %>"
+    end
+
+    expect(build_view(template: "show").call(context:).to_s).to eq "1:_wrapper|B:show|2:_wrapper"
+  end
+
   it "restores the outer template name after a partial returns" do
     with_directory(dir) do
       write "show.html.erb", <<~ERB

@@ -48,6 +48,7 @@ module Hanami
 
       def template(name, format, scope, &block)
         old_prefixes = @prefixes.dup
+        old_template_names = @current_template_names
 
         result = lookup(name, format)
         raise TemplateNotFoundError.new(name, format, config_data.paths) unless result
@@ -56,12 +57,12 @@ module Hanami
 
         new_prefix = File.dirname(name)
         @prefixes << new_prefix unless @prefixes.include?(new_prefix)
-        @current_template_names << resolve_template_name(relative_path)
+        @current_template_names = old_template_names + [resolve_template_name(relative_path)]
 
-        render(template_path, scope, &block)
+        render(template_path, scope, &yielded_block(block, old_template_names))
       ensure
         @prefixes = old_prefixes
-        @current_template_names.pop if result
+        @current_template_names = old_template_names
       end
 
       def partial(name, format, scope, &block)
@@ -103,6 +104,28 @@ module Hanami
               end
             end
             nil
+          end
+        }
+      end
+
+      # Wraps a block yielded into a template so that, while it runs, `#current_template_name`
+      # reports the template that _wrote_ the block, not the one yielding to it.
+      #
+      # A block passed to `render` is written inside the calling template, so its contents belong to
+      # that template even though they're evaluated during the rendering of another.
+      #
+      # @return [Proc, nil]
+      def yielded_block(block, caller_template_names)
+        return nil unless block
+
+        proc { |*args|
+          yielding_template_names = @current_template_names
+          @current_template_names = caller_template_names
+
+          begin
+            block.call(*args)
+          ensure
+            @current_template_names = yielding_template_names
           end
         }
       end

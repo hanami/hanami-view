@@ -17,6 +17,8 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Fixed
 
+- Report the calling template as the current template name inside blocks passed to `render`, instead of the partial the block is yielded into. (@timriley in #281)
+
 ### Security
 
 [Unreleased]: https://github.com/hanami/view/compare/v3.0.0...HEAD
