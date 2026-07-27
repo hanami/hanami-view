@@ -16,7 +16,7 @@ module Hanami
     #   rendered, its parent directory (e.g. `"users"` for `"users/index"`) is pushed onto the stack
     #   so that a partial referenced by its bare name (e.g. `render("form")` from inside
     #   `users/index.html.erb`) can be found alongside the template that renders it. The stack is
-    #    snapshot-and-restored around each render via `ensure`.
+    #   snapshot-and-restored around each render via `ensure`.
     #
     # `#lookup` tries every combination of a path and a prefix, joining each pair with the
     # requested name to find a matching file. `paths` are checked in configured order; an earlier
@@ -55,7 +55,7 @@ module Hanami
 
         template_path, relative_path = result
 
-        new_prefix = File.dirname(name)
+        new_prefix = File.dirname(relative_path)
         @prefixes << new_prefix unless @prefixes.include?(new_prefix)
         @current_template_names = old_template_names + [resolve_template_name(relative_path)]
 
