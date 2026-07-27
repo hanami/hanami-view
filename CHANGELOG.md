@@ -21,6 +21,11 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 - Look up bare-named partials in the directory containing the template that renders them, instead of a same-named directory at the root. (@timriley in #282)
 
     Previously, a partial rendered via a relative path (e.g. `render("shared/fields")` from `posts/show`) would look for its own bare-named partials under `shared/` at the root, rather than `posts/shared/`.
+- Look up partials in the directory of the template rendering them before falling back to enclosing directories and then the root, instead of searching the root first. (@timriley in #283)
+
+    Previously, a partial at the root shadowed a same-named partial sitting alongside the template that rendered it. With both `_form.html.erb` and `posts/_form.html.erb` present, `render("form")` from `posts/show.html.erb` rendered the root `_form`; it now renders `posts/_form`.
+
+    This directory specificity outranks view path order, which now only matters when the same partial path exists across different view paths (earliest wins).
 
 ### Security
 
