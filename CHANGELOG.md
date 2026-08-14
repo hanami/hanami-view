@@ -17,14 +17,20 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Fixed
 
+### Security
+
+[Unreleased]: https://github.com/hanami/view/compare/v3.0.1...HEAD
+
+## [3.0.1] - 2026-08-14
+
+### Fixed
+
 - Report the calling template as the current template name inside blocks passed to `render`, instead of the partial the block is yielded into. (@timriley in #281)
 - Look up bare-named partials in the directory containing the template that renders them, instead of a same-named directory at the root. (@timriley in #282)
 
     Previously, a partial rendered via a relative path (e.g. `render("shared/fields")` from `posts/show`) would look for its own bare-named partials under `shared/` at the root, rather than `posts/shared/`.
 
-### Security
-
-[Unreleased]: https://github.com/hanami/view/compare/v3.0.0...HEAD
+[3.0.1]: https://github.com/hanami/view/compare/v3.0.0...v3.0.1
 
 ## [3.0.0] - 2026-06-30
 
