@@ -19,7 +19,15 @@ module Hanami
         # behavior.
         #
         # Unregistering first ensures our engines are always used, regardless of load order.
-        mapping.unregister "erb", "rhtml", "haml", "slim"
+        #
+        # Tilt also matches the longest registered extension first (see `Tilt::Mapping#split`), and
+        # it registers "html.erb" as an extension of its own. So a template named "index.html.erb"
+        # would match "html.erb" and never reach the engine we register for "erb" below.
+        #
+        # We unregister "html.erb" without registering a replacement. This leaves Tilt to fall back
+        # to "erb", which means our own engine is used, and any `renderer_engine_mapping` given for
+        # `erb:` continues to work.
+        mapping.unregister "erb", "rhtml", "html.erb", "haml", "slim"
 
         # Register our own ERB template.
         mapping.register_lazy "Hanami::View::ERB::Template", "hanami/view/erb/template", "erb", "rhtml"
