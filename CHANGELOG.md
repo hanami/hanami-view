@@ -17,11 +17,17 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Fixed
 
-- Ensure Hanami::View::ERB::Engine is still used for `.html.erb` templates with Tilt 2.9. (@timriley in #284)
-
 ### Security
 
-[Unreleased]: https://github.com/hanami/view/compare/v3.0.1...HEAD
+[Unreleased]: https://github.com/hanami/view/compare/v3.0.2...HEAD
+
+## [3.0.2] - 2026-08-21
+
+### Fixed
+
+- Ensure `Hanami::View::ERB::Engine` is still used for `.html.erb` templates with Tilt 2.9. (@timriley in #284)
+
+[3.0.2]: https://github.com/hanami/view/compare/v3.0.1...v3.0.2
 
 ## [3.0.1] - 2026-08-14
 
