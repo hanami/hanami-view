@@ -263,7 +263,7 @@ module Hanami
     #   Defaults to `{default_encoding: "utf-8"}`. Any options passed will be
     #   merged onto the defaults.
     #
-    #   @see https://github.com/rtomayko/tilt
+    #   @see https://github.com/jeremyevans/tilt
     #
     #   @param options [Hash] renderer options
     #   @api public
@@ -282,7 +282,7 @@ module Hanami
     #   @example
     #     config.renderer_engine_mapping = {erb: Tilt::ErubiTemplate}
     #
-    #   @see https://github.com/rtomayko/tilt
+    #   @see https://github.com/jeremyevans/tilt
     #
     #   @param mapping [Hash<Symbol, Class>] engine mapping
     #   @api public

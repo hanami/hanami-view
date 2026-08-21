@@ -15,7 +15,7 @@ module Hanami
     #   helpers. This allows helpers like `<%= form_for(:post) do %>` to be used, with the
     #   `form_for` helper itself doing nothing more special than a `yield`.
     #
-    # See [Tilt](https://github.com/rtomayko/tilt) for rendering options.
+    # See [Tilt](https://github.com/jeremyevans/tilt) for rendering options.
     #
     # @example
     #   Hanami::View::ERB::Template.new { "<%= 'Hello, world!' %>" }.render
