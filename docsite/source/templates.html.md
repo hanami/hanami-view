@@ -18,7 +18,7 @@ An example is `index.html.slim`, which would be found for a view controller with
 
 ## Template engines
 
-hanami-view uses [Tilt](https://github.com/rtomayko/tilt) to render its templates, and relies upon Tilt’s auto-detection of rendering engine based on the template file’s extension. However, you should explicitly `require` any engine gems that you intend to use.
+hanami-view uses [Tilt](https://github.com/jeremyevans/tilt) to render its templates, and relies upon Tilt’s auto-detection of rendering engine based on the template file’s extension. However, you should explicitly `require` any engine gems that you intend to use.
 
 Some Tilt-supplied template engines may not fully support hanami-view's features (like implicit block capturing). Your view will raise an exception, along with instructions for resolving the issue, if Tilt provides a non-compatible engine.
 

@@ -31,7 +31,7 @@ end
 
 ### Template engine
 
-- **renderer_options**: a hash of options to pass to the template engine, defaults to `{default_encoding: "utf-8"}`. Template engines are provided by [Tilt](https://github.com/rtomayko/tilt); see Tilt's documentation for what options your template engine may support.
+- **renderer_options**: a hash of options to pass to the template engine, defaults to `{default_encoding: "utf-8"}`. Template engines are provided by [Tilt](https://github.com/jeremyevans/tilt); see Tilt's documentation for what options your template engine may support.
 - **renderer_engine_mapping**: a hash specifying the template engine class to use for a given format, e.g. `{erb: Tilt::ErubiTemplate}`. Template engine detection is automatic based on format; use this setting only if you want to force a non-preferred engine.
 
 ## Sharing configuration via inheritance
