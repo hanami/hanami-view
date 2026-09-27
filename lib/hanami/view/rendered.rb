@@ -22,14 +22,6 @@ module Hanami
       # @since 2.1.0
       attr_reader :output
 
-      # Returns the hash of locals used to render the view output.
-      #
-      # @return [Hash[<Symbol, Hanami::View::Part>] locals hash
-      #
-      # @api public
-      # @since 2.1.0
-      attr_reader :locals
-
       # @api private
       # @since 2.1.0
       def initialize(output:, locals:)
@@ -37,7 +29,22 @@ module Hanami
         @locals = locals
       end
 
+      # Returns the hash of locals used to render the view output.
+      #
+      # Resolves every exposure not already resolved during rendering.
+      #
+      # @return [Hash[<Symbol, Hanami::View::Part>] locals hash
+      #
+      # @api public
+      # @since 2.1.0
+      def locals
+        @locals.to_h
+      end
+
       # Returns the local corresponding to the key.
+      #
+      # Resolves the matching exposure (and its dependencies) if it was not already resolved
+      # during rendering.
       #
       # @param name [Symbol] local key
       #
@@ -46,7 +53,7 @@ module Hanami
       # @api public
       # @since 2.1.0
       def [](name)
-        locals[name]
+        @locals[name]
       end
 
       # Returns the rendered view output.

@@ -43,75 +43,65 @@ RSpec.describe Hanami::View::Exposures do
     end
   end
 
-  describe "#call" do
-    describe "in general" do
-      before do
-        exposures.add(:greeting, -> greeting: { greeting.upcase })
-        exposures.add(:farewell, -> greeting { "#{greeting} and goodbye" })
-      end
+  describe "#eager_names" do
+    it "returns eager exposures and their dependencies, all the way down" do
+      exposures.add(:a, -> **_input { "a" })
+      exposures.add(:b, -> a { a })
+      exposures.add(:c, -> b { b }, eager: true)
+      exposures.add(:d, -> **_input { "d" })
 
-      subject(:locals) { exposures.(greeting: "hello") }
-
-      it "returns the values from calling the exposures" do
-        expect(locals).to eq(greeting: "HELLO", farewell: "HELLO and goodbye")
-      end
-
-      it "does not include values from private exposures" do
-        exposures.add(:hidden, -> **_input { "shh" }, private: true)
-
-        expect(locals).to include(:greeting, :farewell)
-        expect(locals).not_to include(:hidden)
-      end
+      expect(exposures.eager_names).to contain_exactly(:a, :b, :c)
     end
 
-    describe "with block provided" do
-      before do
-        exposures.add(:greeting, -> greeting: { greeting.upcase })
-        exposures.add(:farewell, -> greeting { "#{greeting} and goodbye" })
-      end
+    it "is shared with bound copies" do
+      exposures.add(:a, -> **_input { "a" }, eager: true)
 
-      subject(:locals) {
-        exposures.(greeting: "hello") do |value, exposure|
-          "#{value} from #{exposure.name}"
-        end
+      expect(exposures.bind(Object.new).eager_names).to be exposures.eager_names
+    end
+
+    it "is recomputed after an exposure is added" do
+      exposures.add(:a, -> **_input { "a" }, eager: true)
+      exposures.eager_names
+      exposures.add(:b, -> **_input { "b" }, eager: true)
+
+      expect(exposures.eager_names).to eq [:a, :b]
+    end
+  end
+
+  describe "#ensure_acyclic" do
+    it "does nothing when there are no cycles" do
+      exposures.add(:a, -> **_input { "a" })
+      exposures.add(:b, -> a, missing { a })
+
+      expect { exposures.ensure_acyclic }.not_to raise_error
+    end
+
+    it "raises a CyclicExposureError naming the cycle" do
+      exposures.add(:a, -> b { b })
+      exposures.add(:b, -> a { a })
+
+      expect { exposures.ensure_acyclic }.to raise_error(Hanami::View::CyclicExposureError) { |error|
+        expect(error.cycle).to eq [:a, :b, :a]
       }
-
-      it "provides values determined from the block" do
-        expect(locals).to eq(
-          greeting: "HELLO from greeting",
-          farewell: "HELLO from greeting and goodbye from farewell"
-        )
-      end
     end
 
-    describe "with default exposure values" do
-      it "returns 'default_value' from exposure" do
-        exposures.add(:name, default: "John")
-        locals = exposures.({})
+    it "shares its result with bound copies" do
+      exposures.add(:a, -> **_input { "a" })
+      exposures.ensure_acyclic
 
-        expect(locals).to eq(name: "John")
-      end
+      # Add a cycle without going through #add, which would replace the cache. A bound copy still
+      # uses the shared result, so it does not check again.
+      exposures.exposures[:a] = Hanami::View::Exposure.new(:a, -> a { a })
 
-      it "returns values from arguments" do
-        exposures.add(:name, default: "John")
-        locals = exposures.(name: "William")
+      expect { exposures.bind(Object.new).ensure_acyclic }.not_to raise_error
+    end
 
-        expect(locals).to eq(name: "William")
-      end
+    it "checks again after an exposure is added" do
+      exposures.add(:a, -> **_input { "a" })
+      exposures.ensure_acyclic
+      exposures.add(:b, -> b { b })
 
-      it "returns values from arguments even when value is nil" do
-        exposures.add(:name, default: "John")
-        locals = exposures.(name: nil)
-
-        expect(locals).to eq(name: nil)
-      end
-
-      it "returns value from proc" do
-        exposures.add(:name, -> name: { name.upcase }, default: "John")
-        locals = exposures.(name: "William")
-
-        expect(locals).to eq(name: "WILLIAM")
-      end
+      expect { exposures.ensure_acyclic }.to raise_error(Hanami::View::CyclicExposureError)
     end
   end
 
