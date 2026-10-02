@@ -90,6 +90,86 @@ RSpec.describe Hanami::View::ERB::Template do
     expect(output).to eq render_erubi(src)
   end
 
+  it "supports leading trim markers in code tags" do
+    src = <<~ERB
+      <%- items = [1, 2] -%>
+      <p><%= items.sum %></p>
+    ERB
+
+    output = render(src)
+
+    expect(output).to eq <<~TEXT
+      <p>3</p>
+    TEXT
+
+    expect(output).to eq render_erubi(src)
+  end
+
+  it "supports leading trim markers in code tags opening blocks" do
+    src = <<~ERB
+      <%- 3.times do |n| -%>
+      * <%= n %>
+      <%- end -%>
+    ERB
+
+    output = render(src)
+
+    expect(output).to eq <<~TEXT
+      * 0
+      * 1
+      * 2
+    TEXT
+
+    expect(output).to eq render_erubi(src)
+  end
+
+  it "supports leading trim markers in expression tags" do
+    expect(render("<%-= '<' %>")).to eq "&lt;"
+    expect(render("<%-== '<' %>")).to eq "<"
+  end
+
+  it "supports leading trim markers in comment tags" do
+    src = <<~ERB
+      hello
+      <%-# comment -%>
+      world
+    ERB
+
+    output = render(src)
+
+    expect(output).to eq <<~TEXT
+      hello
+      world
+    TEXT
+
+    expect(output).to eq render_erubi(src)
+  end
+
+  it "trims whitespace around leading trim markers in the same way as code tags" do
+    src = <<~ERB
+      <div>
+        <%- items = [1, 2] -%>
+        <%= items.sum %>
+      </div>
+    ERB
+
+    trimmed_output = render(src, template_opts: {trim: true})
+
+    expect(trimmed_output).to eq <<~TEXT
+      <div>
+        3
+      </div>
+    TEXT
+
+    expect(trimmed_output).to eq render_erubi(src, template_opts: {trim: true})
+
+    non_trimmed_output = render(src, template_opts: {trim: false})
+
+    expect(non_trimmed_output).to eq "<div>\n  \n  3\n</div>\n"
+
+    expect(non_trimmed_output).to eq render_erubi(src, template_opts: {trim: false})
+  end
+
   it "respects <%% and %%>" do
     src = <<~ERB
       <%%
