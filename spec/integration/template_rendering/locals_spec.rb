@@ -14,10 +14,6 @@ RSpec.describe "Template rendering / locals" do
       expose :text, decorate: false
     end.new
 
-    if RUBY_VERSION < "3.4"
-      expect(view.call(text: "Hello").to_s).to eq %(Locals: {:text=>"Hello"})
-    else
-      expect(view.call(text: "Hello").to_s).to eq %(Locals: {text: "Hello"})
-    end
+    expect(view.call(text: "Hello").to_s).to eq %(Locals: #<Hanami::View::Locals keys=[:text]>)
   end
 end
