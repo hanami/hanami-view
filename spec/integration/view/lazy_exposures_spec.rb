@@ -227,25 +227,25 @@ RSpec.describe "View / lazy exposures" do
   end
 
   describe "dependency cycles" do
-    it "raises a CyclicExposureError naming the cycle" do
-      view = build_view(template: "") {
-        expose(:a) { |c| c }
-        expose(:b) { |a| a }
-        expose(:c) { |b| b }
-      }
-
-      expect { view.call }.to raise_error(
+    it "raises a CyclicExposureError naming the cycle when the view is initialized" do
+      expect {
+        build_view(template: "") {
+          expose(:a) { |c| c }
+          expose(:b) { |a| a }
+          expose(:c) { |b| b }
+        }
+      }.to raise_error(
         Hanami::View::CyclicExposureError,
         "exposures depend on each other in a cycle: a -> c -> b -> a"
       )
     end
 
     it "raises a CyclicExposureError for an exposure that depends on itself" do
-      view = build_view(template: "") {
-        expose(:a) { |a| a }
-      }
-
-      expect { view.call }.to raise_error(Hanami::View::CyclicExposureError, /a -> a/)
+      expect {
+        build_view(template: "") {
+          expose(:a) { |a| a }
+        }
+      }.to raise_error(Hanami::View::CyclicExposureError, /a -> a/)
     end
 
     it "checks subclasses separately" do
@@ -259,7 +259,7 @@ RSpec.describe "View / lazy exposures" do
         expose(:b) { |a| a }
       }
 
-      expect { child.new.call }.to raise_error(Hanami::View::CyclicExposureError)
+      expect { child.new }.to raise_error(Hanami::View::CyclicExposureError)
     end
   end
 end

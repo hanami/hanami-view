@@ -587,6 +587,8 @@ module Hanami
     # Subclasses can define their own `#initialize` to accept injected dependencies, but must call
     # `super()` to ensure the standard view initialization can proceed.
     #
+    # @raise [CyclicExposureError] if the view's exposures depend on each other in a cycle
+    #
     # @api public
     # @since 2.1.0
     def initialize
@@ -622,8 +624,6 @@ module Hanami
     # @param input input data for preparing exposure values
     #
     # @return [Rendered] rendered view object
-    #
-    # @raise [CyclicExposureError] if the view's exposures depend on each other in a cycle
     #
     # @api public
     # @since 2.1.0
@@ -667,8 +667,6 @@ module Hanami
 
     # Returns the locals for a rendering, with the eager exposures already resolved.
     def locals(rendering, input)
-      exposures.ensure_acyclic
-
       decorator = -> value, exposure {
         if exposure.decorate?(default: config_data.decorate_exposures) && value
           rendering.part(exposure.name, value, as: exposure.options[:as])

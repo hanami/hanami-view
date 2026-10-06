@@ -53,10 +53,14 @@ RSpec.describe Hanami::View::Exposures do
       expect(exposures.eager_names).to contain_exactly(:a, :b, :c)
     end
 
-    it "is shared with bound copies" do
-      exposures.add(:a, -> **_input { "a" }, eager: true)
+    it "is worked out again for bound copies, using the dependencies of exposures defined as methods" do
+      exposures.add(:a, -> **_input { "a" })
+      exposures.add(:b, eager: true)
 
-      expect(exposures.bind(Object.new).eager_names).to be exposures.eager_names
+      object = Class.new { def b(a) = a }.new
+
+      expect(exposures.eager_names).to eq [:b]
+      expect(exposures.bind(object).eager_names).to eq [:b, :a]
     end
 
     it "is recomputed after an exposure is added" do
@@ -68,40 +72,65 @@ RSpec.describe Hanami::View::Exposures do
     end
   end
 
-  describe "#ensure_acyclic" do
-    it "does nothing when there are no cycles" do
+  describe "#public_names" do
+    it "returns the names of the exposures that are not private" do
+      exposures.add(:a, -> **_input { "a" })
+      exposures.add(:b, -> **_input { "b" }, private: true)
+
+      expect(exposures.public_names).to eq Set[:a]
+    end
+  end
+
+  describe "#layout_names" do
+    it "returns the names of the public exposures marked with `layout: true`" do
+      exposures.add(:a, -> **_input { "a" }, layout: true)
+      exposures.add(:b, -> **_input { "b" })
+      exposures.add(:c, -> **_input { "c" }, layout: true, private: true)
+
+      expect(exposures.layout_names).to eq Set[:a]
+    end
+  end
+
+  describe "dependency cycles" do
+    let(:object) { Object.new }
+
+    it "does not raise when there are no cycles" do
       exposures.add(:a, -> **_input { "a" })
       exposures.add(:b, -> a, missing { a })
 
-      expect { exposures.ensure_acyclic }.not_to raise_error
+      expect { exposures.bind(object) }.not_to raise_error
     end
 
-    it "raises a CyclicExposureError naming the cycle" do
+    it "raises a CyclicExposureError naming the cycle when binding" do
       exposures.add(:a, -> b { b })
       exposures.add(:b, -> a { a })
 
-      expect { exposures.ensure_acyclic }.to raise_error(Hanami::View::CyclicExposureError) { |error|
+      expect { exposures.bind(object) }.to raise_error(Hanami::View::CyclicExposureError) { |error|
         expect(error.cycle).to eq [:a, :b, :a]
       }
     end
 
-    it "shares its result with bound copies" do
-      exposures.add(:a, -> **_input { "a" })
-      exposures.ensure_acyclic
+    it "includes the dependencies of exposures defined as methods" do
+      exposures.add(:a, -> b { b })
+      exposures.add(:b)
 
-      # Add a cycle without going through #add, which would replace the cache. A bound copy still
-      # uses the shared result, so it does not check again.
-      exposures.exposures[:a] = Hanami::View::Exposure.new(:a, -> a { a })
+      object = Class.new { def b(a) = a }.new
 
-      expect { exposures.bind(Object.new).ensure_acyclic }.not_to raise_error
+      expect { exposures.bind(object) }.to raise_error(Hanami::View::CyclicExposureError) { |error|
+        expect(error.cycle).to eq [:a, :b, :a]
+      }
     end
 
-    it "checks again after an exposure is added" do
-      exposures.add(:a, -> **_input { "a" })
-      exposures.ensure_acyclic
-      exposures.add(:b, -> b { b })
+    it "raises when creating a set of exposures" do
+      cyclic = {a: Hanami::View::Exposure.new(:a, -> a { a })}
 
-      expect { exposures.ensure_acyclic }.to raise_error(Hanami::View::CyclicExposureError)
+      expect { described_class.new(cyclic) }.to raise_error(Hanami::View::CyclicExposureError)
+    end
+
+    it "does not raise when adding exposures" do
+      exposures.add(:a, -> b { b })
+
+      expect { exposures.add(:b, -> a { a }) }.not_to raise_error
     end
   end
 

@@ -11,7 +11,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 - Add `expose!` and `decorate!` to define eager exposures. Eager exposures run before any template renders, along with the exposures they depend on. Use them when an exposure's errors must raise before rendering starts (such as a not-found error), or when an exposure must run even if no template reads it. `expose!` is a shorthand for the new `eager: true` exposure option, which you can also give to `expose`, `decorate` and `private_expose`. (@timriley)
 - Add `Hanami::View::Locals`, which holds a view's locals and resolves them lazily. This is available via `Rendered#locals` as well as `locals` or `_locals` inside templates. It replaces what was previously a plain hash. To access members, it provides `#[]` and `#fetch` (resolve one local), `#key?` (resolves nothing), and `#to_h` (resolves every local). (@timriley)
-- Raise `Hanami::View::CyclicExposureError` when exposures depend on each other in a cycle. The error names the cycle. Views check for cycles once per class, on first render. (@timriley)
+- Raise `Hanami::View::CyclicExposureError` when exposures depend on each other in a cycle. The error names the cycle. Views check for cycles when they are initialized. (@timriley)
 
 ### Changed
 

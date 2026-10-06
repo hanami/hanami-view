@@ -33,9 +33,7 @@ module Hanami
         @exposures = exposures
         @input = input
         @decorator = decorator
-        @keys = keys || exposures.each.filter_map { |name, exposure|
-          name unless exposure.private?
-        }.to_set
+        @keys = keys || exposures.public_names
         @resolved = resolved
       end
 
@@ -126,7 +124,7 @@ module Hanami
           @exposures,
           @input,
           decorator: @decorator,
-          keys: @keys.select { |key| @exposures[key].for_layout? }.to_set,
+          keys: @exposures.layout_names,
           resolved: @resolved
         )
       end
