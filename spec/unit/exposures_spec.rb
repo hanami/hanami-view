@@ -41,6 +41,11 @@ RSpec.describe Hanami::View::Exposures do
     it "returns a new copy of the exposures" do
       expect(exposures.exposures).not_to eql(bound_exposures.exposures)
     end
+
+    it "returns a frozen copy, which cannot be changed" do
+      expect { bound_exposures.add(:other, -> **_input { "other" }) }.to raise_error(FrozenError)
+      expect(bound_exposures.key?(:other)).to be false
+    end
   end
 
   describe "#eager_names" do

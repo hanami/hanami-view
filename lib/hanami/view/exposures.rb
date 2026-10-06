@@ -43,12 +43,12 @@ module Hanami
 
       def add(name, proc = nil, **options)
         exposures[name] = Exposure.new(name, proc, **options)
-        @names = build_names
+        @names = nil
       end
 
       def import(name, exposure)
         exposures[name] = exposure.dup
-        @names = build_names
+        @names = nil
       end
 
       def bind(obj)
@@ -56,7 +56,7 @@ module Hanami
           exposure.bind(obj)
         }
 
-        self.class.new(bound_exposures)
+        self.class.new(bound_exposures.freeze).freeze
       end
 
       # Returns the names of the eager exposures, plus the names of their dependencies, all the way
@@ -64,29 +64,34 @@ module Hanami
       #
       # @return [Array<Symbol>]
       def eager_names
-        @names.eager
+        names.eager
       end
 
       # Returns the names of the public (non-private) exposures.
       #
       # @return [Set<Symbol>]
       def public_names
-        @names.public
+        names.public
       end
 
       # Returns the names of the public exposures marked with `layout: true`.
       #
       # @return [Set<Symbol>]
       def layout_names
-        @names.layout
+        names.layout
       end
 
       private
 
-      # Prepares the names returned by {#eager_names}, {#public_names} and {#layout_names}.
+      # Returns the names used by {#eager_names}, {#public_names} and {#layout_names}.
       #
-      # Exposures defined as methods have no dependencies until they're bound, so for an unbound
-      # set, these names may be incomplete. Only bound exposures (see {#bind}) have them all.
+      # During exposure definition, these names are cleared by {#add} or {#import}. In this case, it
+      # builds and returns them without storing them.
+      #
+      # When bound exposures are created for a view instance (via {#bind}), names are built and
+      # stored, and the exposures frozen, which keeps them for the full lifetime of the view.
+      def names = @names || build_names
+
       def build_names
         eager = {}
         exposures.each_value do |exposure|
