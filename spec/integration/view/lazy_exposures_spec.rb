@@ -124,7 +124,7 @@ RSpec.describe "View / lazy exposures" do
 
       expect(calls).to eq [:body, :option, :hidden, :decorated, :template_start]
       expect(rendered[:decorated]).to be_a Hanami::View::Part
-      expect(rendered.locals).not_to include(:hidden)
+      expect(rendered.locals.key?(:hidden)).to be false
     end
 
     it "calls the dependencies of eager exposures eagerly" do
@@ -175,8 +175,43 @@ RSpec.describe "View / lazy exposures" do
       expect(rendered[:other]).to eq "Other"
       expect(calls).to eq [:body, :other]
 
-      expect(rendered.locals).to eq(body: "Body", other: "Other")
+      expect(rendered.locals.to_h).to eq(body: "Body", other: "Other")
       expect(calls).to eq [:body, :other]
+    end
+
+    it "returns the lazy locals from #locals, without resolving them" do
+      template = <<~ERB
+        <p><%= body %></p>
+      ERB
+      view = build_view(template:) {
+        expose(:body) { calls << :body; "Body" }
+        expose(:other) { calls << :other; "Other" }
+      }
+
+      rendered = view.call
+      locals = rendered.locals
+
+      expect(locals).to be_a Hanami::View::Locals
+      expect(calls).to eq [:body]
+
+      expect(locals[:other]).to eq "Other"
+      expect(calls).to eq [:body, :other]
+    end
+
+    it "does not resolve exposures when inspected or compared" do
+      template = <<~ERB
+        <p><%= body %></p>
+      ERB
+      view = build_view(template:) {
+        expose(:body) { "Body" }
+        expose(:boom) { raise "boom ran" }
+      }
+
+      rendered = view.call
+
+      expect { rendered.inspect }.not_to raise_error
+      expect { rendered == view.call }.not_to raise_error
+      expect { rendered.hash }.not_to raise_error
     end
   end
 
