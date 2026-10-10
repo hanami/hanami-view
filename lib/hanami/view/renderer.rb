@@ -44,11 +44,13 @@ module Hanami
         @config_data = config_data
         @prefixes = [CURRENT_PATH_PREFIX]
         @current_template_names = []
+        @current_scope = nil
       end
 
       def template(name, format, scope, &block)
         old_prefixes = @prefixes.dup
         old_template_names = @current_template_names
+        old_scope = @current_scope
 
         result = lookup(name, format)
         raise TemplateNotFoundError.new(name, format, config_data.paths) unless result
@@ -59,10 +61,15 @@ module Hanami
         @prefixes << new_prefix unless @prefixes.include?(new_prefix)
         @current_template_names = old_template_names + [resolve_template_name(relative_path)]
 
-        render(template_path, scope, &yielded_block(block, old_template_names))
+        # A partial rendered without arguments is given its caller's own scope.
+        inherited = scope.equal?(old_scope)
+        @current_scope = scope
+
+        render(template_path, scope, inherited:, &yielded_block(block, old_template_names, old_scope))
       ensure
         @prefixes = old_prefixes
         @current_template_names = old_template_names
+        @current_scope = old_scope
       end
 
       def partial(name, format, scope, &block)
@@ -109,23 +116,27 @@ module Hanami
       end
 
       # Wraps a block yielded into a template so that, while it runs, `#current_template_name`
-      # reports the template that _wrote_ the block, not the one yielding to it.
+      # reports the template that _wrote_ the block, not the one yielding to it, and a partial it
+      # renders without arguments is recognised as sharing that template's scope.
       #
       # A block passed to `render` is written inside the calling template, so its contents belong to
       # that template even though they're evaluated during the rendering of another.
       #
       # @return [Proc, nil]
-      def yielded_block(block, caller_template_names)
+      def yielded_block(block, caller_template_names, caller_scope)
         return nil unless block
 
         proc { |*args|
           yielding_template_names = @current_template_names
+          yielding_scope = @current_scope
           @current_template_names = caller_template_names
+          @current_scope = caller_scope
 
           begin
             block.call(*args)
           ensure
             @current_template_names = yielding_template_names
+            @current_scope = yielding_scope
           end
         }
       end
@@ -147,13 +158,21 @@ module Hanami
         segments.join(PATH_DELIMITER)
       end
 
-      def render(path, scope, &block)
+      def render(path, scope, inherited: false, &block)
         template = tilt(path)
 
         # A template declaring its locals is compiled to a method taking them as keywords, so it
-        # receives the locals themselves. Any other template receives them under `locals`, which
-        # gives it the whole hash as a local variable.
-        locals = template.fixed_locals? ? scope._locals : {locals: scope._locals}
+        # receives the locals passed to it, and none when it shares its caller's scope. Any other
+        # template receives its scope's locals under `locals`, which gives it the whole hash as a
+        # local variable.
+        locals =
+          if !template.fixed_locals?
+            {locals: scope._locals}
+          elsif inherited
+            {}
+          else
+            scope._locals
+          end
 
         template.render(scope, locals, &block).html_safe
       end

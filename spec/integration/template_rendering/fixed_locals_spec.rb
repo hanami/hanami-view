@@ -100,17 +100,30 @@ RSpec.describe "Template rendering / fixed locals" do
     end
   end
 
-  describe "in a partial rendered without arguments" do
-    it "receives its caller's locals, since it shares the caller's scope" do
-      view = Class.new(Hanami::View) do
+  describe "in a partial" do
+    def render_template(template)
+      Class.new(Hanami::View) do
         config.paths = FIXTURES_PATH.join("integration/template_rendering/fixed_locals/erb")
-        config.template = "shared_scope"
+        config.template = template
 
         expose :title
-        expose :subtitle
-      end.new
+      end.new.(title: "Profile").to_s.strip
+    end
 
-      expect(view.(title: "Profile", subtitle: "Mine").to_s.strip).to eq "<h1>Profile</h1>"
+    it "receives none of its caller's locals when rendered without arguments" do
+      expect { render_template("shared_scope") }.to raise_error(ArgumentError, /missing keyword: :title/)
+    end
+
+    it "receives none of its caller's locals when rendered without arguments inside a yielded block" do
+      expect { render_template("yielded_scope") }.to raise_error(ArgumentError, /missing keyword: :title/)
+    end
+
+    it "receives the locals passed to it" do
+      expect(render_template("passed_scope")).to eq "<h1>Profile</h1>"
+    end
+
+    it "receives the locals of a scope built for it" do
+      expect(render_template("built_scope")).to eq "<h1>Profile</h1>"
     end
   end
 

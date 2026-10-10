@@ -9,7 +9,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Added
 
-- Templates can declare the locals they take with a magic comment, such as `<%# locals: (title:, subtitle: nil) %>`, in any template language. Rendering raises an `ArgumentError` for a missing or unknown local and fills in defaults. Turned on through Tilt's `extract_fixed_locals`, which is now among the default renderer options; set it to false to opt out. In ERB, Haml, and Slim the declaration must open a comment, and ends at its matching parenthesis. An existing comment in this form, such as one kept from a Rails app, is now enforced. (@parndt)
+- Templates can declare the locals they take with a magic comment, such as `<%# locals: (title:, subtitle: nil) %>`, in any template language. Rendering raises an `ArgumentError` for a missing or unknown local and fills in defaults. A declaring partial receives only the locals passed to it, never its caller's. Turned on through Tilt's `extract_fixed_locals`, which is now among the default renderer options; set it to false to opt out. In ERB, Haml, and Slim the declaration must open a comment, and ends at its matching parenthesis. An existing comment in this form, such as one kept from a Rails app, is now enforced. (@parndt)
 
 ### Changed
 
