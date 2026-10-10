@@ -35,7 +35,7 @@ module Hanami
           ::Slim::Engine,
           use_html_safe: true,
           capture_generator: HTMLSafeStringBuffer
-        ).include(FixedLocals::SLIM)
+        ).include(FixedLocals::LINE)
       end
     end
   end

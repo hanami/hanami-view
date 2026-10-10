@@ -40,6 +40,20 @@ RSpec.describe "Template rendering / fixed locals" do
 
         expect(view.(title: "Profile").to_s).to include "locals: (user:)"
       end
+
+      it "ends the declaration at its closing parenthesis, ignoring text after it" do
+        view = Class.new(Hanami::View) do
+          config.paths = FIXTURES_PATH.join("integration/template_rendering/fixed_locals", engine)
+          config.template = "described"
+
+          expose :title
+        end.new
+
+        expect(view.(title: "Profile").to_s.strip).to eq "Profile"
+
+        view = Class.new(view.class) { expose :subtitle }.new
+        expect { view.(title: "Profile", subtitle: "Mine") }.to raise_error(ArgumentError, /unknown keyword: :subtitle/)
+      end
     end
   end
 
