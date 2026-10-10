@@ -7,8 +7,9 @@ module Hanami
     # Tilt's own extraction matches `# locals: (` anywhere in a template, including its text, and
     # takes everything up to the last closing parenthesis on the line. A page showing the syntax as
     # an example then becomes a declaring template, and a comment followed by other parenthesised
-    # text fails to compile. Each template engine instead includes a module that only accepts the
-    # declaration as the whole of one of that language's comments.
+    # text fails to compile. Each template engine instead includes a module whose pattern only
+    # accepts the declaration at the start of a comment, and ends it at the parenthesis matching
+    # its opening one.
     #
     # @api private
     # @since 3.1.0
@@ -27,23 +28,19 @@ module Hanami
         end
       end
 
-      # `<%# locals: (title:) %>`, which may span several lines but not leave its tag.
+      # `<%# locals: (title:) %>`, opening an ERB comment. The locals may span lines, but not leave
+      # the comment's tag.
       #
       # @api private
       # @since 3.1.0
-      ERB = new(/<%#\s*locals:\s*(\((?:(?!%>).)*\))\s*-?%>/m)
+      ERB = new(/<%\#\s*locals:\s*(?<params>\((?:(?!%>)[^()]|\g<params>)*\))/)
 
-      # `-# locals: (title:)`, on a line of its own.
+      # `-# locals: (title:)` in Haml, or `/# locals: (title:)` in Slim, with only non-word
+      # characters before it on its line.
       #
       # @api private
       # @since 3.1.0
-      HAML = new(/^[ \t]*-#[ \t]*locals:[ \t]*(\(.*\))[ \t]*$/)
-
-      # `/# locals: (title:)` or `//# locals: (title:)`, on a line of its own.
-      #
-      # @api private
-      # @since 3.1.0
-      SLIM = new(%r{^[ \t]*/{1,2}[ \t]*\#[ \t]*locals:[ \t]*(\(.*\))[ \t]*$})
+      LINE = new(/^[^\w\n]*\#\s*locals:\s*(?<params>\((?:[^()\n]|\g<params>)*\))/)
     end
   end
 end
