@@ -29,6 +29,36 @@ RSpec.describe "Template rendering / fixed locals" do
       it "raises for an unknown local" do
         expect { view.(partial_locals: {name: "Jane", nmae: "Jane"}) }.to raise_error(ArgumentError, /unknown keyword: :nmae/)
       end
+
+      it "ignores the declaration's syntax appearing outside a comment" do
+        view = Class.new(Hanami::View) do
+          config.paths = FIXTURES_PATH.join("integration/template_rendering/fixed_locals", engine)
+          config.template = "mentioned"
+
+          expose :title
+        end.new
+
+        expect(view.(title: "Profile").to_s).to include "locals: (user:)"
+      end
+    end
+  end
+
+  describe "in an ERB comment" do
+    def render_template(template, **exposures)
+      Class.new(Hanami::View) do
+        config.paths = FIXTURES_PATH.join("integration/template_rendering/fixed_locals/erb")
+        config.template = template
+
+        exposures.each_key { |name| expose name }
+      end.new.(**exposures).to_s.strip
+    end
+
+    it "ends the declaration with its tag, ignoring parentheses after it" do
+      expect(render_template("followed", title: "Profile")).to eq "Profile (see the docs)"
+    end
+
+    it "reads a declaration spanning several lines" do
+      expect(render_template("multiline", title: "Profile")).to eq "Profile, Mine"
     end
   end
 
