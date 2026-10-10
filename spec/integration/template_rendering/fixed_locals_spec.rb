@@ -129,6 +129,20 @@ RSpec.describe "Template rendering / fixed locals" do
     it "receives the locals of a scope built for it" do
       expect(render_template("built_scope")).to eq "<h1>Profile</h1>"
     end
+
+    it "renders without arguments from a scope class requiring its locals when built" do
+      view = Class.new(Hanami::View) do
+        config.paths = FIXTURES_PATH.join("integration/template_rendering/fixed_locals/erb")
+        config.template = "plain_scope"
+        config.scope = Class.new(Hanami::View::Scope) {
+          def initialize(locals:, **)
+            super
+          end
+        }
+      end.new
+
+      expect(view.().to_s.strip).to eq "Plain"
+    end
   end
 
   describe "with extract_fixed_locals turned off" do

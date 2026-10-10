@@ -65,7 +65,7 @@ module Hanami
         # locals renders with a copy of that scope holding none of them, so its caller's locals
         # neither fill its keywords nor answer to their names.
         if scope.equal?(old_scope) && tilt(template_path).fixed_locals?
-          scope = scope.class.new(name: scope._name, rendering: scope._rendering)
+          scope = scope.class.new(name: scope._name, locals: {}, rendering: scope._rendering)
         end
         @current_scope = scope
 
