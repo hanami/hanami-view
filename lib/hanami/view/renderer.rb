@@ -33,6 +33,9 @@ module Hanami
       # Matches the `.format.engine` extensions on a template path (e.g. `.html.erb`).
       EXTENSIONS_REGEXP = /\.[^.\/]+\.[^.\/]+\z/
 
+      # Types of the named keyword parameters in a method's `#parameters`, required and optional.
+      KEYWORD_PARAMETERS = %i[keyreq key].freeze
+
       # Stack of resolved names for the templates and partials currently being rendered. The top of
       # the stack is the innermost render in progress.
       #
@@ -148,7 +151,34 @@ module Hanami
       end
 
       def render(path, scope, &block)
-        tilt(path).render(scope, {locals: scope._locals}, &block).html_safe
+        template = tilt(path)
+
+        # A template declaring its locals is compiled to a method taking them as keywords, so it
+        # receives the locals themselves. Any other template receives them under `locals`, which
+        # gives it the whole hash as a local variable.
+        locals = template.fixed_locals? ? fixed_locals(template, scope) : {locals: scope._locals}
+
+        template.render(scope, locals, &block).html_safe
+      end
+
+      # Returns the keywords for a template declaring its locals.
+      #
+      # A view's template and layout are given lazy {Locals}, which resolve each exposure only when
+      # it is read. Passing them as keywords would resolve every one, so the template receives only
+      # the exposures it declares. Every other exposure is given as `nil`, without being resolved,
+      # so that Ruby still raises for each one the template does not declare. A template taking the
+      # rest with `**` can pass them on, so it receives every exposure.
+      #
+      # @return [Hash{Symbol => Object}]
+      def fixed_locals(template, scope)
+        locals = scope._locals
+        return locals unless locals.is_a?(Locals)
+
+        parameters = template.compiled_method([], scope.class).parameters
+        return locals.to_h if parameters.any? { |type, _| type == :keyrest }
+
+        declared = parameters.filter_map { |type, name| name if KEYWORD_PARAMETERS.include?(type) }
+        locals.keys.to_h { |key| [key, (locals[key] if declared.include?(key))] }
       end
 
       def tilt(path)

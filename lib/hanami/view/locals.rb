@@ -49,6 +49,16 @@ module Hanami
         @keys.include?(key)
       end
 
+      # Returns the names of the locals. Does not resolve any exposures.
+      #
+      # @return [Array<Symbol>]
+      #
+      # @api public
+      # @since 3.1.0
+      def keys
+        @keys.to_a
+      end
+
       # Returns the value of the local with the given name, or nil if there is no such local.
       #
       # Resolves the matching exposure (and its dependencies) only.
