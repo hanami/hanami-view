@@ -23,6 +23,65 @@ module Hanami
 
       include Dry::Equalizer(:_name, :_locals, :_rendering)
 
+      class << self
+        # Declares the locals the scope takes.
+        #
+        # A scope built with {#scope} (from a template or a part) is then checked against the
+        # declaration: a missing or unknown local raises an `ArgumentError`, and defaults are
+        # filled in for locals not given. The scope's methods and the partials it renders see the
+        # locals with their defaults.
+        #
+        # This declares what the scope takes, not what any one partial takes, since a scope can
+        # render more than one partial.
+        #
+        # Subclasses inherit the declaration, and may replace it with their own.
+        #
+        # @example
+        #   class Greeting < Hanami::View::Scope
+        #     locals :name, greeting: "Hello"
+        #
+        #     def message = "#{greeting}, #{name}!"
+        #   end
+        #
+        # @param required [Array<Symbol>] locals the scope must be given
+        # @param defaults [Hash{Symbol => Object}] locals the scope may be given, with their
+        #   defaults
+        #
+        # @return [void]
+        #
+        # @api public
+        # @since 3.1.0
+        def locals(*required, **defaults)
+          @_locals_declaration = ScopeLocals.new(scope_class: self, required:, defaults:)
+        end
+
+        # Returns the scope's declared locals, or nil if it declares none.
+        #
+        # @return [ScopeLocals, nil]
+        #
+        # @api private
+        # @since 3.1.0
+        def _locals_declaration
+          return @_locals_declaration if instance_variable_defined?(:@_locals_declaration)
+
+          superclass._locals_declaration if superclass.respond_to?(:_locals_declaration)
+        end
+
+        # Returns the locals checked against the scope's declaration, with defaults filled in, or
+        # the locals unchanged if it declares none.
+        #
+        # @param locals [Hash{Symbol => Object}]
+        #
+        # @return [Hash{Symbol => Object}]
+        #
+        # @api private
+        # @since 3.1.0
+        def _declared_locals(locals)
+          declaration = _locals_declaration
+          declaration ? declaration.(locals) : locals
+        end
+      end
+
       # Returns the scope's name.
       #
       # @return [Symbol]
@@ -110,10 +169,29 @@ module Hanami
       #
       # @return [Scope]
       #
+      # @raise [ArgumentError] if the scope class declares its locals (see {.locals}) and one is
+      #   missing or unknown
+      #
       # @api public
       # @since 2.1.0
       def scope(name = nil, **locals)
-        _rendering.scope(name, locals)
+        _rendering.scope(name, locals)._with_declared_locals
+      end
+
+      # Returns the scope with its locals checked against its class's declaration and defaults
+      # filled in, or the scope itself if its class declares none.
+      #
+      # @return [Scope]
+      #
+      # @raise [ArgumentError] if a declared local is missing, or a local is not declared
+      #
+      # @api private
+      # @since 3.1.0
+      def _with_declared_locals
+        declared = self.class._declared_locals(_locals)
+        return self if declared.equal?(_locals)
+
+        self.class.new(name: _name, locals: declared, rendering: _rendering)
       end
 
       # Returns the template format for the current render environment.

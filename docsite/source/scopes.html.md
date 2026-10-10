@@ -111,6 +111,22 @@ class MediaPlayer < Hanami::View::Scope
 end
 ```
 
+## Declaring locals
+
+A scope class can declare the locals it takes, with defaults for the optional ones:
+
+```ruby
+class MediaPlayer < Hanami::View::Scope
+  locals :audio_file, show_artwork: true
+end
+```
+
+Building the scope with `scope(:media_player, ...)`, from a template or a part, then raises an `ArgumentError` for a missing local (`missing local: :audio_file for MediaPlayer`) or one the class does not declare, and fills in the defaults for the rest. The scope's methods, and the partials it renders, see the locals with their defaults. A scope built from a part is given the part under the part's name, so declare that too.
+
+This declares what the scope takes, not what any one partial takes, since one scope can render several partials. Partials rendered from the scope with their own arguments are not checked against it.
+
+Subclasses inherit the declaration, and may replace it with their own.
+
 ## Accessing the context
 
 In your scope classes, you can access the [context object](docs::context) as `#_context` (or `#context` as a convenience, provided there is no local named `context`).

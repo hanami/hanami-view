@@ -9,6 +9,8 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Added
 
+- Scope classes can declare the locals they take with `locals :name, greeting: "Hello"`. Building one with `scope(...)` raises an `ArgumentError` for a missing or unknown local and fills in defaults. (@parndt)
+
 ### Changed
 
 ### Deprecated
