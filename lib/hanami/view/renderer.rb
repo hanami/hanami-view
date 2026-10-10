@@ -61,11 +61,15 @@ module Hanami
         @prefixes << new_prefix unless @prefixes.include?(new_prefix)
         @current_template_names = old_template_names + [resolve_template_name(relative_path)]
 
-        # A partial rendered without arguments is given its caller's own scope.
-        inherited = scope.equal?(old_scope)
+        # A partial rendered without arguments is given its caller's own scope. One declaring its
+        # locals renders with a copy of that scope holding none of them, so its caller's locals
+        # neither fill its keywords nor answer to their names.
+        if scope.equal?(old_scope) && tilt(template_path).fixed_locals?
+          scope = scope.class.new(name: scope._name, rendering: scope._rendering)
+        end
         @current_scope = scope
 
-        render(template_path, scope, inherited:, &yielded_block(block, old_template_names, old_scope))
+        render(template_path, scope, &yielded_block(block, old_template_names, old_scope))
       ensure
         @prefixes = old_prefixes
         @current_template_names = old_template_names
@@ -158,21 +162,13 @@ module Hanami
         segments.join(PATH_DELIMITER)
       end
 
-      def render(path, scope, inherited: false, &block)
+      def render(path, scope, &block)
         template = tilt(path)
 
         # A template declaring its locals is compiled to a method taking them as keywords, so it
-        # receives the locals passed to it, and none when it shares its caller's scope. Any other
-        # template receives its scope's locals under `locals`, which gives it the whole hash as a
-        # local variable.
-        locals =
-          if !template.fixed_locals?
-            {locals: scope._locals}
-          elsif inherited
-            {}
-          else
-            scope._locals
-          end
+        # receives the locals themselves. Any other template receives them under `locals`, which
+        # gives it the whole hash as a local variable.
+        locals = template.fixed_locals? ? scope._locals : {locals: scope._locals}
 
         template.render(scope, locals, &block).html_safe
       end

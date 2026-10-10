@@ -118,6 +118,10 @@ RSpec.describe "Template rendering / fixed locals" do
       expect { render_template("yielded_scope") }.to raise_error(ArgumentError, /missing keyword: :title/)
     end
 
+    it "cannot read its caller's locals by name when rendered without arguments" do
+      expect { render_template("peek_scope") }.to raise_error(NameError, /title/)
+    end
+
     it "receives the locals passed to it" do
       expect(render_template("passed_scope")).to eq "<h1>Profile</h1>"
     end

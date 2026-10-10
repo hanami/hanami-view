@@ -49,9 +49,9 @@ RSpec.describe Hanami::View::Renderer do
 
     it "exposes the resolved template name during a template render" do
       captured = nil
-      allow(renderer).to receive(:render).and_wrap_original do |original, *args, **kwargs, &block|
+      allow(renderer).to receive(:render).and_wrap_original do |original, *args, &block|
         captured = renderer.current_template_name
-        original.call(*args, **kwargs, &block)
+        original.call(*args, &block)
       end
 
       renderer.template("hello", :html, scope)
@@ -61,9 +61,9 @@ RSpec.describe Hanami::View::Renderer do
 
     it "exposes the resolved partial name during a partial render" do
       captured = nil
-      allow(renderer).to receive(:render).and_wrap_original do |original, *args, **kwargs, &block|
+      allow(renderer).to receive(:render).and_wrap_original do |original, *args, &block|
         captured = renderer.current_template_name
-        original.call(*args, **kwargs, &block)
+        original.call(*args, &block)
       end
 
       renderer.partial("hello", :html, scope)
@@ -73,9 +73,9 @@ RSpec.describe Hanami::View::Renderer do
 
     it "exposes the resolved partial name including its directory when partial is in a subdirectory" do
       captured = nil
-      allow(renderer).to receive(:render).and_wrap_original do |original, *args, **kwargs, &block|
+      allow(renderer).to receive(:render).and_wrap_original do |original, *args, &block|
         captured = renderer.current_template_name
-        original.call(*args, **kwargs, &block)
+        original.call(*args, &block)
       end
 
       renderer.partial("shared/shared_hello", :html, scope)
@@ -110,9 +110,9 @@ RSpec.describe Hanami::View::Renderer do
 
     it "holds a single entry during a flat render" do
       captured = nil
-      allow(renderer).to receive(:render).and_wrap_original do |original, *args, **kwargs, &block|
+      allow(renderer).to receive(:render).and_wrap_original do |original, *args, &block|
         captured = renderer.current_template_names.dup
-        original.call(*args, **kwargs, &block)
+        original.call(*args, &block)
       end
 
       renderer.template("hello", :html, scope)
