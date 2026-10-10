@@ -148,7 +148,14 @@ module Hanami
       end
 
       def render(path, scope, &block)
-        tilt(path).render(scope, {locals: scope._locals}, &block).html_safe
+        template = tilt(path)
+
+        # A template declaring its locals is compiled to a method taking them as keywords, so it
+        # receives the locals themselves. Any other template receives them under `locals`, which
+        # gives it the whole hash as a local variable.
+        locals = template.fixed_locals? ? scope._locals : {locals: scope._locals}
+
+        template.render(scope, locals, &block).html_safe
       end
 
       def tilt(path)

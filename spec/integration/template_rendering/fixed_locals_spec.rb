@@ -1,0 +1,87 @@
+# frozen_string_literal: true
+
+# These adapters are ignored by our Zeitwerk loader, since they require the optional "haml" and
+# "slim" gems. Load them explicitly for these tests.
+require "hanami/view/tilt/haml_adapter"
+require "hanami/view/tilt/slim_adapter"
+
+RSpec.describe "Template rendering / fixed locals" do
+  %w[erb haml slim].each do |engine|
+    describe "in #{engine} templates" do
+      let(:view) {
+        Class.new(Hanami::View) do
+          config.paths = FIXTURES_PATH.join("integration/template_rendering/fixed_locals", engine)
+          config.template = "greeting"
+
+          expose :partial_locals, decorate: false
+        end.new
+      }
+
+      it "renders the locals given, filling in defaults for the rest" do
+        expect(view.(partial_locals: {name: "Jane"}).to_s.strip).to eq "Hello, Jane!"
+        expect(view.(partial_locals: {name: "Jane", greeting: "Kia ora"}).to_s.strip).to eq "Kia ora, Jane!"
+      end
+
+      it "raises for a missing local" do
+        expect { view.(partial_locals: {greeting: "Kia ora"}) }.to raise_error(ArgumentError, /missing keyword: :name/)
+      end
+
+      it "raises for an unknown local" do
+        expect { view.(partial_locals: {name: "Jane", nmae: "Jane"}) }.to raise_error(ArgumentError, /unknown keyword: :nmae/)
+      end
+    end
+  end
+
+  describe "in a view template" do
+    let(:view_class) {
+      Class.new(Hanami::View) do
+        config.paths = FIXTURES_PATH.join("integration/template_rendering/fixed_locals/erb")
+        config.template = "titled"
+      end
+    }
+
+    it "declares the exposures the template takes" do
+      view = Class.new(view_class) { expose :title }.new
+
+      expect(view.(title: "Profile").to_s.strip).to eq "<h1>Profile</h1>"
+    end
+
+    it "raises for an exposure the template does not declare" do
+      view = Class.new(view_class) {
+        expose :title
+        expose :subtitle
+      }.new
+
+      expect { view.(title: "Profile", subtitle: "Mine") }.to raise_error(ArgumentError, /unknown keyword: :subtitle/)
+    end
+  end
+
+  describe "in a partial rendered without arguments" do
+    it "receives its caller's locals, since it shares the caller's scope" do
+      view = Class.new(Hanami::View) do
+        config.paths = FIXTURES_PATH.join("integration/template_rendering/fixed_locals/erb")
+        config.template = "shared_scope"
+
+        expose :title
+        expose :subtitle
+      end.new
+
+      expect(view.(title: "Profile", subtitle: "Mine").to_s.strip).to eq "<h1>Profile</h1>"
+    end
+  end
+
+  describe "with extract_fixed_locals turned off" do
+    it "renders a declaring template as any other, ignoring the comment" do
+      view = Class.new(Hanami::View) do
+        config.paths = FIXTURES_PATH.join("integration/template_rendering/fixed_locals/erb")
+        config.renderer_options = {extract_fixed_locals: false}
+        config.template = "titled"
+
+        expose :title
+        expose :subtitle
+      end.new
+
+      expect(view.(title: "Profile", subtitle: "Mine").to_s.strip).to eq "<h1>Profile</h1>"
+    end
+  end
+end

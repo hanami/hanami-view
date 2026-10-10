@@ -9,7 +9,11 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Added
 
+- Templates can declare the locals they take with a magic comment, such as `<%# locals: (title:, subtitle: nil) %>`, in any template language. Rendering raises an `ArgumentError` for a missing or unknown local and fills in defaults. Turned on through Tilt's `extract_fixed_locals`, which is now among the default renderer options; set it to false to opt out. (@parndt)
+
 ### Changed
+
+- Require Tilt 2.6 or later, the first version supporting fixed locals. (@parndt)
 
 ### Deprecated
 

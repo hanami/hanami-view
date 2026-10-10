@@ -99,3 +99,18 @@ Otherwise, partials accept keywords arguments, which become the partial’s loca
 ```
 
 The view’s context object remains part of the scope for every partial rendering, regardless of the arguments passed.
+
+## Declaring locals
+
+A template can declare the locals it takes with a magic comment, in the same form as a Ruby method's keyword arguments:
+
+```erb
+<%# locals: (form_title:, submit_label: "Send") %>
+<h2><%= form_title %></h2>
+```
+
+Rendering the template then raises an `ArgumentError` for a missing local (`missing keyword: :form_title`) or one it does not declare (`unknown keyword: :titel`), and fills in the defaults for the rest. The comment works in every template language Tilt compiles: `-# locals: (form_title:)` in Haml, and `/# locals: (form_title:)` in Slim.
+
+The comment applies to view templates as well as partials, in which case it declares the view's exposures. A partial rendered without arguments shares its caller's scope, and so receives its caller's locals: declare those too, or take the rest with `**`.
+
+Templates without the comment are unaffected. To turn the comment off, set `config.renderer_options = {extract_fixed_locals: false}`.
