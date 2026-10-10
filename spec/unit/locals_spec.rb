@@ -17,6 +17,13 @@ RSpec.describe Hanami::View::Locals do
     exposures.add(:title, -> hidden { calls << :title; "#{hidden}!" }, layout: true)
   end
 
+  describe "#keys" do
+    it "returns the names of public exposures, without resolving them" do
+      expect(locals.keys).to eq %i[greeting farewell title]
+      expect(calls).to be_empty
+    end
+  end
+
   describe "#key?" do
     it "returns true for public exposures" do
       expect(locals.key?(:greeting)).to be true

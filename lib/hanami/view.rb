@@ -49,7 +49,7 @@ module Hanami
     gem_loader.setup
 
     # @api private
-    DEFAULT_RENDERER_OPTIONS = {default_encoding: "utf-8"}.freeze
+    DEFAULT_RENDERER_OPTIONS = {default_encoding: "utf-8", extract_fixed_locals: true}.freeze
 
     include Dry::Equalizer(:config, :exposures)
 
@@ -260,8 +260,14 @@ module Hanami
     #   provided by Tilt; see Tilt's documentation for what options your
     #   template engine may support.
     #
-    #   Defaults to `{default_encoding: "utf-8"}`. Any options passed will be
-    #   merged onto the defaults.
+    #   Defaults to `{default_encoding: "utf-8", extract_fixed_locals: true}`. Any options passed
+    #   will be merged onto the defaults.
+    #
+    #   `extract_fixed_locals` lets a template declare the locals it takes with a magic comment,
+    #   such as `<%# locals: (user:, title: "Profile") %>` in ERB, `-# locals: (user:)` in Haml,
+    #   or `/# locals: (user:)` in Slim. Rendering the template then raises an `ArgumentError` for
+    #   a missing or unknown local, and fills in any defaults. Templates without the comment are
+    #   unaffected. Pass `extract_fixed_locals: false` to turn this off.
     #
     #   @see https://github.com/jeremyevans/tilt
     #
