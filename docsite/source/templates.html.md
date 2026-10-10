@@ -109,8 +109,8 @@ A template can declare the locals it takes with a magic comment, in the same for
 <h2><%= form_title %></h2>
 ```
 
-Rendering the template then raises an `ArgumentError` for a missing local (`missing keyword: :form_title`) or one it does not declare (`unknown keyword: :titel`), and fills in the defaults for the rest. The comment works in every template language Tilt compiles: `-# locals: (form_title:)` in Haml, and `/# locals: (form_title:)` in Slim.
+Rendering the template then raises an `ArgumentError` for a missing local (`missing keyword: :form_title`) or one it does not declare (`unknown keyword: :titel`), and fills in the defaults for the rest. In Haml the comment is `-# locals: (form_title:)`, and in Slim `/# locals: (form_title:)`, each on a line of its own. The declaration must be the whole comment, so a template whose text shows the syntax, as this page does, is unaffected. Other template languages rely on Tilt's own extraction, which finds `# locals: (` anywhere in the template.
 
-The comment applies to view templates as well as partials, in which case it declares the view's exposures. A partial rendered without arguments shares its caller's scope, and so receives its caller's locals: declare those too, or take the rest with `**`.
+The comment applies to view templates as well as partials, in which case it declares the view's exposures: all of them, including any a base view class adds later. Declare the ones the template uses and take the rest with `**`, as in `<%# locals: (post:, **) %>`. Likewise, a partial rendered from a part is given the part under its name. A partial rendered without arguments shares its caller's scope, and so receives its caller's locals: declare those too, or take the rest with `**`.
 
-Templates without the comment are unaffected. To turn the comment off, set `config.renderer_options = {extract_fixed_locals: false}`.
+Templates without the comment are unaffected, but an existing comment in this form, such as one kept from a Rails app, is now enforced. To turn the comment off, set `config.renderer_options = {extract_fixed_locals: false}`.

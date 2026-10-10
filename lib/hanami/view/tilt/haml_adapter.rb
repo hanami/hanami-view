@@ -35,7 +35,7 @@ module Hanami
           ::Haml::Engine,
           use_html_safe: true,
           capture_generator: HTMLSafeStringBuffer
-        )
+        ).include(FixedLocals::HAML)
       end
     end
   end
