@@ -121,11 +121,13 @@ class MediaPlayer < Hanami::View::Scope
 end
 ```
 
-Building the scope with `scope(:media_player, ...)`, from a template or a part, then raises an `ArgumentError` for a missing local (`missing local: :audio_file for MediaPlayer`) or one the class does not declare, and fills in the defaults for the rest. The scope's methods, and the partials it renders, see the locals with their defaults. A scope built from a part is given the part under the part's name, so declare that too.
+Building the scope with `scope(:media_player, ...)`, from a template or a part, then raises an `ArgumentError` for a missing local (`missing local: :audio_file for MediaPlayer`) or one the class does not declare, and fills in the defaults for the rest. The scope's methods, and the partials it renders without arguments, see the locals with their defaults. A default is one object shared by every scope built without that local, so do not mutate it.
 
-This declares what the scope takes, not what any one partial takes, since one scope can render several partials. Partials rendered from the scope with their own arguments are not checked against it.
+A scope built from a part is given the part under the part's name, which follows the name it is exposed under, so declare that too. A declaring scope therefore serves parts exposed under one name.
 
-Subclasses inherit the declaration, and may replace it with their own.
+This declares what the scope takes, not what any one partial takes, since one scope can render several partials. A partial rendered from the scope with arguments gets a new scope of the same class holding only those arguments, unchecked, so the scope's methods there see only those.
+
+Subclasses inherit the declaration, and may replace it with their own, but cannot return to taking any locals unchecked. A class may declare its locals only once. A declaration on a view's own scope, set with `config.scope`, is not checked, since that scope's locals are the view's exposures.
 
 ## Accessing the context
 

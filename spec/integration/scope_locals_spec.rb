@@ -55,8 +55,18 @@ RSpec.describe "Scopes / declared locals" do
       end
     end
 
-    expect { Test::Scopes::Formal._declared_locals({}) }.to raise_error(ArgumentError, /missing local: :name/)
+    expect { Test::Scopes::Formal._declared_locals({}) }
+      .to raise_error(ArgumentError, "missing local: :name for Test::Scopes::Formal")
     expect(Test::Scopes::Casual._declared_locals({name: "Jane"})).to eq(name: "Jane")
+  end
+
+  it "raises for a class declaring its locals twice" do
+    expect { Test::Scopes::Greeting.locals :name }
+      .to raise_error(ArgumentError, "locals already declared for Test::Scopes::Greeting")
+  end
+
+  it "takes locals keyed by String as Symbols" do
+    expect(Test::Scopes::Greeting._declared_locals({"name" => "Jane"})).to eq(greeting: "Hello", name: "Jane")
   end
 
   it "does not check the locals of partials the scope renders" do
@@ -81,9 +91,13 @@ RSpec.describe "Scopes / declared locals" do
 
     expect { view.(person: {name: "Jane"}) }.to raise_error(ArgumentError, "unknown local: :person for Test::Scopes::Greeting")
 
+    Test::Scopes::Greeting.remove_instance_variable(:@_locals_declaration)
     Test::Scopes::Greeting.locals :name, :person, greeting: "Hello"
 
     expect(view.(person: {name: "Jane"}).to_s.strip).to eq "Hello, Jane!"
+
+    part = Test::Parts::Person.new(value: {name: "Jane"}, rendering: view.rendering)
+    expect(part._scope(:greeting, name: "Jane")._locals).to include(person: part)
   end
 
   it "leaves a scope without a declaration unchecked" do

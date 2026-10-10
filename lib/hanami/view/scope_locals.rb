@@ -11,21 +11,20 @@ module Hanami
     # @api private
     # @since 3.1.0
     class ScopeLocals
-      # @param scope_class [Class] the declaring scope class, named in error messages
       # @param required [Array<Symbol>] locals the scope must be given
       # @param defaults [Hash{Symbol => Object}] locals the scope may be given, with their defaults
       #
       # @api private
       # @since 3.1.0
-      def initialize(scope_class:, required:, defaults:)
-        @scope_class = scope_class
+      def initialize(required:, defaults:)
         @required = required.map(&:to_sym).freeze
         @defaults = defaults.transform_keys(&:to_sym).freeze
       end
 
-      # Returns the locals with defaults filled in.
+      # Returns the locals, keyed by Symbol, with defaults filled in.
       #
-      # @param locals [Hash{Symbol => Object}]
+      # @param locals [Hash{Symbol, String => Object}]
+      # @param scope_class [Class] the scope class being built, named in error messages
       #
       # @return [Hash{Symbol => Object}]
       #
@@ -33,21 +32,22 @@ module Hanami
       #
       # @api private
       # @since 3.1.0
-      def call(locals)
+      def call(locals, scope_class:)
+        locals = locals.transform_keys(&:to_sym)
         missing = @required - locals.keys
         unknown = locals.keys - @required - @defaults.keys
 
-        raise ArgumentError, message("missing", missing) if missing.any?
-        raise ArgumentError, message("unknown", unknown) if unknown.any?
+        raise ArgumentError, message("missing", missing, scope_class) if missing.any?
+        raise ArgumentError, message("unknown", unknown, scope_class) if unknown.any?
 
         @defaults.merge(locals)
       end
 
       private
 
-      def message(kind, names)
+      def message(kind, names, scope_class)
         noun = names.one? ? "local" : "locals"
-        "#{kind} #{noun}: #{names.map(&:inspect).join(", ")} for #{@scope_class.name || @scope_class.inspect}"
+        "#{kind} #{noun}: #{names.map(&:inspect).join(", ")} for #{scope_class.name || scope_class.inspect}"
       end
     end
   end

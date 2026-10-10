@@ -28,13 +28,18 @@ module Hanami
         #
         # A scope built with {#scope} (from a template or a part) is then checked against the
         # declaration: a missing or unknown local raises an `ArgumentError`, and defaults are
-        # filled in for locals not given. The scope's methods and the partials it renders see the
-        # locals with their defaults.
+        # filled in for locals not given. The scope's methods, and the partials it renders without
+        # arguments, see the locals with their defaults.
         #
         # This declares what the scope takes, not what any one partial takes, since a scope can
-        # render more than one partial.
+        # render more than one partial. A partial rendered with arguments gets a new scope of the
+        # same class holding only those arguments, unchecked.
         #
-        # Subclasses inherit the declaration, and may replace it with their own.
+        # A default is one object shared by every scope built without that local, so do not mutate
+        # it.
+        #
+        # Subclasses inherit the declaration, and may replace it with their own, but cannot return
+        # to taking any locals unchecked. A class may declare its locals only once.
         #
         # @example
         #   class Greeting < Hanami::View::Scope
@@ -49,10 +54,16 @@ module Hanami
         #
         # @return [void]
         #
+        # @raise [ArgumentError] if the class has already declared its locals
+        #
         # @api public
         # @since 3.1.0
         def locals(*required, **defaults)
-          @_locals_declaration = ScopeLocals.new(scope_class: self, required:, defaults:)
+          if instance_variable_defined?(:@_locals_declaration)
+            raise ArgumentError, "locals already declared for #{name || inspect}"
+          end
+
+          @_locals_declaration = ScopeLocals.new(required:, defaults:)
         end
 
         # Returns the scope's declared locals, or nil if it declares none.
@@ -78,7 +89,7 @@ module Hanami
         # @since 3.1.0
         def _declared_locals(locals)
           declaration = _locals_declaration
-          declaration ? declaration.(locals) : locals
+          declaration ? declaration.(locals, scope_class: self) : locals
         end
       end
 

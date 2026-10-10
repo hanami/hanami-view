@@ -157,7 +157,7 @@ module Hanami
       # @api public
       # @since 2.1.0
       def _scope(scope_name = nil, **locals)
-        _rendering.scope(scope_name, {_name => self}.merge(locals))._with_declared_locals
+        _rendering.scope(scope_name, {_name.to_sym => self}.merge(locals))._with_declared_locals
       end
 
       # Returns a string representation of the value.
