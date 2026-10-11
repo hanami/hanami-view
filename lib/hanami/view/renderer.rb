@@ -10,7 +10,8 @@ module Hanami
     # Template lookup combines two pieces of state:
     #
     # - **`config.paths`** — the configured view paths, immutable for the lifetime of the
-    #   renderer. When multiple view paths are configured, earlier ones override later ones.
+    #   renderer. When multiple view paths are configured, earlier ones override later ones for the
+    #   same relative path.
     # - **`@prefixes`** — a stack of subdirectories within each view path to search, mutated
     #   during rendering. It starts at `[CURRENT_PATH_PREFIX]` (the root itself). When a template is
     #   rendered, its parent directory (e.g. `"users"` for `"users/index"`) is pushed onto the stack
@@ -18,11 +19,12 @@ module Hanami
     #   `users/index.html.erb`) can be found alongside the template that renders it. The stack is
     #   snapshot-and-restored around each render via `ensure`.
     #
-    # `#lookup` tries every combination of a path and a prefix, joining each pair with the
-    # requested name to find a matching file. `paths` are checked in configured order; an earlier
-    # entry overrides a later one. `prefixes` are checked oldest-first: a partial at the root
-    # wins over a same-named partial in a directory pushed onto the stack mid-render. First match
-    # wins.
+    # `#lookup` tries every combination of a prefix and a path, joining each pair with the
+    # requested name to find a matching file. `prefixes` are the outer loop, checked newest-first:
+    # the directory of the template currently rendering wins over the enclosing directories it was
+    # reached through, and the root is searched last. Within each prefix, `paths` are checked in
+    # configured order, so an earlier path overrides a later one for the same directory. First
+    # match wins.
     #
     # @api private
     class Renderer
@@ -94,8 +96,8 @@ module Hanami
       def lookup(name, format)
         View.cache.fetch_or_store(:lookup, name, format, config_data.object_id, prefixes) {
           catch :found do
-            config_data.paths.each do |path|
-              prefixes.each do |prefix|
+            prefixes.reverse_each do |prefix|
+              config_data.paths.each do |path|
                 file_path = path.lookup(prefix, name, format)
                 if file_path
                   relative_path = Pathname.new(file_path).relative_path_from(path.dir).to_s
