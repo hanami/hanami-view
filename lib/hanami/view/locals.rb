@@ -103,6 +103,28 @@ module Hanami
         @keys.each.with_object({}) { |key, hsh| hsh[key] = resolve(key) }
       end
 
+      # Returns true if the given locals or Hash has the same locals and values.
+      #
+      # Resolves every exposure, here and in the other locals.
+      #
+      # @example
+      #   rendered.locals == {title: "Hello"}
+      #
+      # @param other [Locals, Hash]
+      #
+      # @return [Boolean]
+      #
+      # @api public
+      # @since 3.1.0
+      def ==(other)
+        case other
+        when Locals, Hash
+          to_h == other.to_h
+        else
+          false
+        end
+      end
+
       # Returns a string for debugging. Does not resolve any exposures.
       #
       # @return [String]

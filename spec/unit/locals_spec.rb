@@ -97,6 +97,32 @@ RSpec.describe Hanami::View::Locals do
     end
   end
 
+  describe "#==" do
+    let(:hash) { {greeting: "HELLO", farewell: "HELLO and goodbye", title: "shh!"} }
+
+    it "is true for a Hash with the same locals and values" do
+      expect(locals).to eq hash
+      expect(locals).not_to eq hash.merge(title: "other")
+    end
+
+    it "is true for other locals with the same locals and values" do
+      expect(locals).to eq described_class.new(exposures, input)
+      expect(locals).not_to eq described_class.new(exposures, {greeting: "hi"})
+    end
+
+    it "resolves every exposure" do
+      expect(locals == hash).to be true
+      expect(calls).to contain_exactly(:greeting, :farewell, :hidden, :title)
+    end
+
+    it "is false for other objects, even those that convert to an empty Hash" do
+      empty = described_class.new(Hanami::View::Exposures.new, {})
+
+      expect(empty).not_to eq nil
+      expect(empty).not_to eq []
+    end
+  end
+
   describe "#inspect" do
     it "resolves nothing" do
       expect(locals.inspect).to eq "#<Hanami::View::Locals keys=[:greeting, :farewell, :title]>"

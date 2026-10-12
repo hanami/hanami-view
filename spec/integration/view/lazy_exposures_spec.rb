@@ -175,7 +175,7 @@ RSpec.describe "View / lazy exposures" do
       expect(rendered[:other]).to eq "Other"
       expect(calls).to eq [:body, :other]
 
-      expect(rendered.locals.to_h).to eq(body: "Body", other: "Other")
+      expect(rendered.locals).to eq(body: "Body", other: "Other")
       expect(calls).to eq [:body, :other]
     end
 
