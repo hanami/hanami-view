@@ -310,10 +310,17 @@ module Hanami
     #     false, or the value of `config.decorate_exposures`)
     #   @option options [Symbol, Class] :as an alternative name or class to use when finding a
     #     matching Part
+    #   @option options [Boolean] :eager resolve this value before any template renders, instead
+    #     of when it is first read (defaults to false)
 
     # @overload expose(name, **options, &block)
     #   Define a value to be passed to the template. The return value of the
     #   block will be passed to the template.
+    #
+    #   Exposures are lazy: the block runs only when a template (or another
+    #   exposure) first reads its value. The value is then kept for the rest of
+    #   the render. To run an exposure before any template renders, use
+    #   {expose!} or pass `eager: true`.
     #
     #   The block will be evaluated with the view instance as its `self`. The
     #   block's parameters will determine what it is given:
@@ -442,6 +449,35 @@ module Hanami
       expose(*names, **options, decorate: true, &block)
     end
 
+    # Defines an eager exposure. Eager exposures are resolved before any template renders, along
+    # with the exposures they depend on.
+    #
+    # Use this for exposures whose errors must raise before rendering starts (such as a not-found
+    # error), or that must run even when no template reads them.
+    #
+    # This is a shorthand for `expose(..., eager: true)`.
+    #
+    # @see expose
+    #
+    # @api public
+    # @since 3.1.0
+    def self.expose!(*names, **options, &block)
+      expose(*names, **options, eager: true, &block)
+    end
+
+    # Defines an eager exposure that will be decorated with a matching Part.
+    #
+    # This is a shorthand for `expose(..., decorate: true, eager: true)`.
+    #
+    # @see expose!
+    # @see decorate
+    #
+    # @api public
+    # @since 3.1.0
+    def self.decorate!(*names, **options, &block)
+      decorate(*names, **options, eager: true, &block)
+    end
+
     # Returns the defined exposures. These are unbound, since bound exposures
     # are only created when initializing a View instance.
     #
@@ -551,6 +587,8 @@ module Hanami
     # Subclasses can define their own `#initialize` to accept injected dependencies, but must call
     # `super()` to ensure the standard view initialization can proceed.
     #
+    # @raise [CyclicExposureError] if the view's exposures depend on each other in a cycle
+    #
     # @api public
     # @since 2.1.0
     def initialize
@@ -602,7 +640,7 @@ module Hanami
       if layout
         output = rendering.template(
           layout_path(layout),
-          rendering.scope(scope_class, layout_locals(locals))
+          rendering.scope(scope_class, locals.for_layout)
         ) { output }
       end
 
@@ -627,25 +665,23 @@ module Hanami
       raise UndefinedConfigError, :template unless config.template
     end
 
+    # Returns the locals for a rendering, with the eager exposures already resolved.
     def locals(rendering, input)
-      exposures.(context: rendering.context, **input) do |value, exposure|
+      decorator = -> value, exposure {
         if exposure.decorate?(default: config_data.decorate_exposures) && value
           rendering.part(exposure.name, value, as: exposure.options[:as])
         else
           value
         end
-      end
+      }
+
+      locals = Locals.new(exposures, {context: rendering.context, **input}, decorator:)
+      locals.resolve_eager
     end
 
     # @api private
     def layout_path(layout)
       File.join(*[config_data.layouts_dir, layout].compact)
-    end
-
-    def layout_locals(locals)
-      locals.each_with_object({}) do |(key, value), layout_locals|
-        layout_locals[key] = value if exposures[key].for_layout?
-      end
     end
   end
 end

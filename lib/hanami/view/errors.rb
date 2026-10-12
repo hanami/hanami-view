@@ -34,6 +34,26 @@ module Hanami
       end
     end
 
+    # Error raised when exposures depend on each other in a cycle.
+    #
+    # @api public
+    # @since 3.1.0
+    class CyclicExposureError < Error
+      # Returns the names of the exposures in the cycle, starting and ending with the same name.
+      #
+      # @return [Array<Symbol>]
+      #
+      # @api public
+      # @since 3.1.0
+      attr_reader :cycle
+
+      # @api private
+      def initialize(cycle)
+        @cycle = cycle
+        super("exposures depend on each other in a cycle: #{cycle.join(' -> ')}")
+      end
+    end
+
     # Error raised when a rendering is required but not given.
     #
     # @api public
