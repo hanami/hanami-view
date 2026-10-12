@@ -80,7 +80,7 @@ module Hanami
       # @api private
       # @since 2.1.0
       class Parser < Temple::Parser
-        ERB_PATTERN = /(\n|<%%|%%>)|<%(==?|\#)?(.*?)?-?%>/m
+        ERB_PATTERN = /(\n|<%%|%%>)|<%-?(==?|\#)?(.*?)?-?%>/m
 
         IF_UNLESS_CASE_LINE_RE = /\A\s*(if|unless|case)\b/
         BLOCK_LINE_RE = /\s*((\s+|\))do|\{)(\s*\|[^|]*\|)?\s*\Z/
