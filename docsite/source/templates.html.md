@@ -99,3 +99,18 @@ Otherwise, partials accept keywords arguments, which become the partial’s loca
 ```
 
 The view’s context object remains part of the scope for every partial rendering, regardless of the arguments passed.
+
+## Declaring locals
+
+A template can declare the locals it takes with a magic comment, in the same form as a Ruby method's keyword arguments:
+
+```erb
+<%# locals: (form_title:, submit_label: "Send") %>
+<h2><%= form_title %></h2>
+```
+
+Rendering the template then raises an `ArgumentError` for a missing local (`missing keyword: :form_title`) or one it does not declare (`unknown keyword: :titel`), and fills in the defaults for the rest. In Haml the comment is `-# locals: (form_title:)`, and in Slim `/# locals: (form_title:)`, with only comment syntax before it on its line. The declaration must open its comment, and ends at the parenthesis matching its opening one, so a note can follow it, and a template whose text shows the syntax, as this page does, is unaffected. Other template languages rely on Tilt's own extraction, which finds `# locals: (` anywhere in the template.
+
+The comment applies to view templates as well as partials, in which case it declares the view's exposures: all of them, including any a base view class adds later. Declare the ones the template uses and take the rest with `**`, as in `<%# locals: (post:, **) %>`. Since exposures are lazy, a view template runs only the exposures it declares, unless it takes the rest with `**`, which runs them all. Likewise, a partial rendered from a part is given the part under its name. A declaring partial receives only the locals passed to it, or those of a scope built for it, and never its caller's: rendered without arguments, it receives none, and cannot read them by name, though it keeps its caller's scope class and so its methods. A scope method that reads a local then raises in such a partial, as does a scope class whose initializer reads its locals, since the copy is built with none: pass the partial what it needs, as in `render(:avatar, user:)`.
+
+Templates without the comment are unaffected. A comment in this form is enforced wherever it appears, including one kept from a Rails app. To turn the comment off, set `config.renderer_options = {extract_fixed_locals: false}`.

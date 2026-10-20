@@ -33,6 +33,9 @@ module Hanami
       # Matches the `.format.engine` extensions on a template path (e.g. `.html.erb`).
       EXTENSIONS_REGEXP = /\.[^.\/]+\.[^.\/]+\z/
 
+      # Types of the named keyword parameters in a method's `#parameters`, required and optional.
+      KEYWORD_PARAMETERS = %i[keyreq key].freeze
+
       # Stack of resolved names for the templates and partials currently being rendered. The top of
       # the stack is the innermost render in progress.
       #
@@ -44,11 +47,13 @@ module Hanami
         @config_data = config_data
         @prefixes = [CURRENT_PATH_PREFIX]
         @current_template_names = []
+        @current_scope = nil
       end
 
       def template(name, format, scope, &block)
         old_prefixes = @prefixes.dup
         old_template_names = @current_template_names
+        old_scope = @current_scope
 
         result = lookup(name, format)
         raise TemplateNotFoundError.new(name, format, config_data.paths) unless result
@@ -59,10 +64,19 @@ module Hanami
         @prefixes << new_prefix unless @prefixes.include?(new_prefix)
         @current_template_names = old_template_names + [resolve_template_name(relative_path)]
 
-        render(template_path, scope, &yielded_block(block, old_template_names))
+        # A partial rendered without arguments is given its caller's own scope. One declaring its
+        # locals renders with a copy of that scope holding none of them, so its caller's locals
+        # neither fill its keywords nor answer to their names.
+        if scope.equal?(old_scope) && tilt(template_path).fixed_locals?
+          scope = scope.class.new(name: scope._name, locals: {}, rendering: scope._rendering)
+        end
+        @current_scope = scope
+
+        render(template_path, scope, &yielded_block(block, old_template_names, old_scope))
       ensure
         @prefixes = old_prefixes
         @current_template_names = old_template_names
+        @current_scope = old_scope
       end
 
       def partial(name, format, scope, &block)
@@ -109,23 +123,27 @@ module Hanami
       end
 
       # Wraps a block yielded into a template so that, while it runs, `#current_template_name`
-      # reports the template that _wrote_ the block, not the one yielding to it.
+      # reports the template that _wrote_ the block, not the one yielding to it, and a partial it
+      # renders without arguments is recognised as sharing that template's scope.
       #
       # A block passed to `render` is written inside the calling template, so its contents belong to
       # that template even though they're evaluated during the rendering of another.
       #
       # @return [Proc, nil]
-      def yielded_block(block, caller_template_names)
+      def yielded_block(block, caller_template_names, caller_scope)
         return nil unless block
 
         proc { |*args|
           yielding_template_names = @current_template_names
+          yielding_scope = @current_scope
           @current_template_names = caller_template_names
+          @current_scope = caller_scope
 
           begin
             block.call(*args)
           ensure
             @current_template_names = yielding_template_names
+            @current_scope = yielding_scope
           end
         }
       end
@@ -148,7 +166,34 @@ module Hanami
       end
 
       def render(path, scope, &block)
-        tilt(path).render(scope, {locals: scope._locals}, &block).html_safe
+        template = tilt(path)
+
+        # A template declaring its locals is compiled to a method taking them as keywords, so it
+        # receives the locals themselves. Any other template receives them under `locals`, which
+        # gives it the whole hash as a local variable.
+        locals = template.fixed_locals? ? fixed_locals(template, scope) : {locals: scope._locals}
+
+        template.render(scope, locals, &block).html_safe
+      end
+
+      # Returns the keywords for a template declaring its locals.
+      #
+      # A view's template and layout are given lazy {Locals}, which resolve each exposure only when
+      # it is read. Passing them as keywords would resolve every one, so the template receives only
+      # the exposures it declares. Every other exposure is given as `nil`, without being resolved,
+      # so that Ruby still raises for each one the template does not declare. A template taking the
+      # rest with `**` can pass them on, so it receives every exposure.
+      #
+      # @return [Hash{Symbol => Object}]
+      def fixed_locals(template, scope)
+        locals = scope._locals
+        return locals unless locals.is_a?(Locals)
+
+        parameters = template.compiled_method([], scope.class).parameters
+        return locals.to_h if parameters.any? { |type, _| type == :keyrest }
+
+        declared = parameters.filter_map { |type, name| name if KEYWORD_PARAMETERS.include?(type) }
+        locals.keys.to_h { |key| [key, (locals[key] if declared.include?(key))] }
       end
 
       def tilt(path)

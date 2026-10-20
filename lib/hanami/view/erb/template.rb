@@ -24,7 +24,7 @@ module Hanami
     # @since 2.1.0
     module ERB
       # ERB Template class
-      Template = Temple::Templates::Tilt(Engine)
+      Template = Temple::Templates::Tilt(Engine).include(FixedLocals::ERB)
     end
   end
 end
