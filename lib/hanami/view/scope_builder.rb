@@ -41,6 +41,7 @@ module Hanami
           name = rendering.inflector.camelize(name.to_s)
 
           namespace = rendering.scope_namespace
+          raise UndefinedConfigError, :scope_namespace unless namespace
 
           # Give autoloaders a chance to act
           begin

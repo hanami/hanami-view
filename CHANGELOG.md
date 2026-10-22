@@ -27,6 +27,8 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Fixed
 
+- Raise `Hanami::View::UndefinedConfigError` when building a named scope (e.g. `scope("my_scope")`) without a configured `scope_namespace`, instead of an unclear `NoMethodError`. (@anyingiit in #291)
+
 ### Security
 
 [Unreleased]: https://github.com/hanami/view/compare/v3.0.2...HEAD

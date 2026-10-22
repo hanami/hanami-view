@@ -53,6 +53,16 @@ RSpec.describe "scope builder" do
         scope = view.rendering.scope("scope_two", {})
         expect(scope).to be_an_instance_of TestScopes::ScopeTwo
       end
+
+      it "raises an error when no scope_namespace is configured" do
+        view = Class.new(Hanami::View) {
+          config.paths = SPEC_ROOT.join("__ignore__")
+          config.template = "__ignore__"
+        }.new
+
+        expect { view.rendering.scope("scope_one", {}) }
+          .to raise_error(Hanami::View::UndefinedConfigError, "no +scope_namespace+ configured")
+      end
     end
   end
 end
