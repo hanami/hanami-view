@@ -187,6 +187,9 @@ module Hanami
       # @return [Hash{Symbol => Object}]
       def fixed_locals(template, scope)
         locals = scope._locals
+
+        # Lazy locals need special handling, since passing them as keywords would run every
+        # exposure, even those the template never reads. Hash locals can just be passed as is.
         return locals unless locals.is_a?(Locals)
 
         parameters = template.compiled_method([], scope.class).parameters
