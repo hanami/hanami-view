@@ -90,6 +90,16 @@ RSpec.describe "Template rendering / fixed locals" do
       expect(view.(title: "Profile").to_s.strip).to eq "<h1>Profile</h1>"
     end
 
+    it "returns its locals through `locals` and `_locals`" do
+      view = Class.new(view_class) {
+        config.template = "shared/_listed"
+
+        expose :title
+      }.new
+
+      expect(view.(title: "Profile").to_s.strip).to eq "Profile, Profile"
+    end
+
     it "raises for an exposure the template does not declare" do
       view = Class.new(view_class) {
         expose :title
@@ -148,6 +158,26 @@ RSpec.describe "Template rendering / fixed locals" do
 
     it "receives the locals passed to it" do
       expect(render_template("passed_scope")).to eq "<h1>Profile</h1>"
+    end
+
+    describe "reading `locals` and `_locals`" do
+      def render_listed(**partial_locals)
+        Class.new(Hanami::View) do
+          config.paths = FIXTURES_PATH.join("integration/template_rendering/fixed_locals/erb")
+          config.template = "listed"
+
+          expose :title
+          expose :partial_locals, decorate: false
+        end.new.(title: "Profile", partial_locals:).to_s.strip
+      end
+
+      it "returns the locals passed to it" do
+        expect(render_listed(title: "Mine")).to eq "Mine, Mine"
+      end
+
+      it "returns none of its caller's locals when rendered without arguments" do
+        expect(render_listed).to eq "none, none"
+      end
     end
 
     it "receives the locals of a scope built for it" do
