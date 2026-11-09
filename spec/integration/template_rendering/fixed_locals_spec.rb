@@ -54,6 +54,17 @@ RSpec.describe "Template rendering / fixed locals" do
         view = Class.new(view.class) { expose :subtitle }.new
         expect { view.(title: "Profile", subtitle: "Mine") }.to raise_error(ArgumentError, /unknown keyword: :subtitle/)
       end
+
+      it "skips parentheses inside quoted defaults" do
+        view = Class.new(Hanami::View) do
+          config.paths = FIXTURES_PATH.join("integration/template_rendering/fixed_locals", engine)
+          config.template = "quoted"
+
+          expose :title
+        end.new
+
+        expect(view.(title: "Profile").to_s.strip).to eq "(Profile)"
+      end
     end
   end
 
@@ -211,6 +222,25 @@ RSpec.describe "Template rendering / fixed locals" do
       end.new
 
       expect(view.(title: "Profile", subtitle: "Mine").to_s.strip).to eq "<h1>Profile</h1>"
+    end
+  end
+
+  describe "in other template engines" do
+    def view_class
+      Class.new(Hanami::View) do
+        config.paths = FIXTURES_PATH.join("integration/template_rendering/fixed_locals/str")
+        config.template = "mentioned"
+      end
+    end
+
+    it "ignores the declaration's syntax by default" do
+      expect(view_class.new.().to_s.strip).to eq "Declare with # locals: (user:)"
+    end
+
+    it "uses Tilt's own extraction with extract_fixed_locals turned on" do
+      view = Class.new(view_class) { config.renderer_options = {extract_fixed_locals: true} }.new
+
+      expect { view.() }.to raise_error(ArgumentError, /missing keyword: :?user/)
     end
   end
 end
