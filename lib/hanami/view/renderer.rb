@@ -124,7 +124,7 @@ module Hanami
 
       # Wraps a block yielded into a template so that, while it runs, `#current_template_name`
       # reports the template that _wrote_ the block, not the one yielding to it, and a partial it
-      # renders without arguments is recognised as sharing that template's scope.
+      # renders without arguments is recognized as sharing that template's scope.
       #
       # A block passed to `render` is written inside the calling template, so its contents belong to
       # that template even though they're evaluated during the rendering of another.
