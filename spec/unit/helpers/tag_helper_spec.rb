@@ -518,6 +518,15 @@ RSpec.describe Hanami::View::Helpers::TagHelper do
       expect(token_list([nil, "", "ernie"])).to eq "ernie"
     end
 
+    it "excludes false values" do
+      expect(token_list(nil, false, 123, "", "ernie", {bert: true})).to eq "123 ernie bert"
+    end
+
+    it "removes duplicate tokens" do
+      expect(token_list("ernie", "ernie bert")).to eq "ernie bert"
+      expect(token_list("ernie", {ernie: true})).to eq "ernie"
+    end
+
     it "includes hash keys with truthy values" do
       expect(token_list("ernie": true, "bert": false, "elmo": true)).to eq "ernie elmo"
       expect(token_list("ernie": false, "bert": false, "elmo": false)).to eq ""

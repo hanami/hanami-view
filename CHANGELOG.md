@@ -27,6 +27,9 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Fixed
 
+- `token_list` (and its `class_names` alias) now removes duplicate tokens and excludes `false` values, as its documentation describes. Previously `token_list("foo", "foo bar")` returned `"foo foo bar"`, and `false` was included as the token `"false"`. (@parndt in #292)
+- Parts initialized without a `name:` now default to a Symbol name rather than a String. This means `part.render("partial")` makes the part available in the partial under its inferred name, rather than raising a `NameError`. (@parndt in #292)
+
 ### Security
 
 [Unreleased]: https://github.com/hanami/view/compare/v3.0.2...HEAD
