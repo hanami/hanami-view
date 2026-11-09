@@ -159,6 +159,10 @@ RSpec.describe "Template rendering / fixed locals" do
       expect { render_template("shared_scope") }.to raise_error(ArgumentError, /missing keyword: :?title/)
     end
 
+    it "receives none of an enclosing template's locals when rendered without arguments through its scope" do
+      expect { render_template("ancestor_scope") }.to raise_error(ArgumentError, /missing keyword: :?title/)
+    end
+
     it "receives none of its caller's locals when rendered without arguments inside a yielded block" do
       expect { render_template("yielded_scope") }.to raise_error(ArgumentError, /missing keyword: :?title/)
     end
