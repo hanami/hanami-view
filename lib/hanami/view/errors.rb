@@ -14,8 +14,12 @@ module Hanami
     # @api public
     # @since 2.1.0
     class UndefinedConfigError < StandardError
-      def initialize(key)
-        super("no +#{key}+ configured")
+      # @param key [Symbol] the setting that is not configured
+      # @param detail [String, nil] what needed the setting, and how to resolve it
+      #
+      # @api private
+      def initialize(key, detail = nil)
+        super(["no +#{key}+ configured", detail].compact.join("; "))
       end
     end
 

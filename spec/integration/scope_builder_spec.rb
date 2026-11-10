@@ -54,5 +54,32 @@ RSpec.describe "scope builder" do
         expect(scope).to be_an_instance_of TestScopes::ScopeTwo
       end
     end
+
+    describe "without a scope_namespace" do
+      let(:view) {
+        Class.new(Hanami::View) {
+          config.paths = SPEC_ROOT.join("__ignore__")
+          config.template = "__ignore__"
+        }.new
+      }
+
+      it "raises an error naming the scope it cannot find" do
+        expect { view.rendering.scope("sidebar", {}) }.to raise_error(
+          Hanami::View::UndefinedConfigError,
+          'no +scope_namespace+ configured; needed to find scope "sidebar"; ' \
+          "set it, or pass the scope class itself"
+        )
+      end
+
+      it "builds an unnamed scope" do
+        expect(view.rendering.scope({})).to be_an_instance_of Hanami::View::Scope
+      end
+
+      it "builds a scope from a given class" do
+        scope_class = Class.new(Hanami::View::Scope)
+
+        expect(view.rendering.scope(scope_class, {})).to be_an_instance_of scope_class
+      end
+    end
   end
 end
