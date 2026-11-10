@@ -61,9 +61,9 @@ module Hanami
         private :set_fixed_locals, :extract_fixed_locals
       end
 
-      # `<%# locals: (title:) %>`, opening an ERB comment. The locals may span lines, but not leave
-      # the comment's tag.
-      ERB = new(/<%\#\s*locals:\s*#{ERB_PARAMS}/)
+      # `<%# locals: (title:) %>`, opening an ERB comment, which may also take a leading trim marker
+      # (`<%-#`). The locals may span lines, but not leave the comment's tag.
+      ERB = new(/<%-?\#\s*locals:\s*#{ERB_PARAMS}/)
 
       # `-# locals: (title:)`, a Haml silent comment, indented by any amount.
       HAML = new(/^[ \t]*-\#[ \t]*locals:[ \t]*#{LINE_PARAMS}/)

@@ -85,6 +85,10 @@ RSpec.describe "Template rendering / fixed locals" do
     it "reads a declaration spanning several lines" do
       expect(render_template("multiline", title: "Profile")).to eq "Profile, Mine"
     end
+
+    it "reads a declaration after a leading trim marker" do
+      expect { render_template("trimmed", title: "Profile", subtitle: "Mine") }.to raise_error(ArgumentError, /unknown keyword: :subtitle/)
+    end
   end
 
   describe "in a view template" do
