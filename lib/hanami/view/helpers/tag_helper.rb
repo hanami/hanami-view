@@ -152,7 +152,7 @@ module Hanami
             value.split(/\s+/).map { |s| safe ? s.html_safe : s }
           }
 
-          EscapeHelper.escape_join(tokens, " ")
+          EscapeHelper.escape_join(tokens.uniq, " ")
         end
 
         # @see #token_list
@@ -177,7 +177,7 @@ module Hanami
             when Array
               tag_values.concat build_tag_values(*tag_value)
             else
-              tag_values << tag_value.to_s unless tag_value.to_s.empty?
+              tag_values << tag_value.to_s if tag_value && !tag_value.to_s.empty?
             end
           end
 

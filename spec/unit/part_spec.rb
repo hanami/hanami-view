@@ -151,7 +151,13 @@ RSpec.describe Hanami::View::Part do
         }
 
         it "is inferred from the class name" do
-          expect(part._name).to eq "my_part"
+          expect(part._name).to eq :my_part
+        end
+
+        it "makes the part available to partials under its name" do
+          described_part = Test::MyPart.new(value: value, rendering: rendering)
+          described_part.render("info")
+          expect(rendering).to have_received(:partial).with("info", scope_including(my_part: described_part))
         end
       end
 
@@ -160,8 +166,8 @@ RSpec.describe Hanami::View::Part do
           Class.new(Hanami::View::Part).new(value: value)
         }
 
-        it "defaults to 'part'" do
-          expect(part._name).to eq "part"
+        it "defaults to :part" do
+          expect(part._name).to eq :part
         end
       end
     end

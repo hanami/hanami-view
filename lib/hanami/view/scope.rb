@@ -31,14 +31,17 @@ module Hanami
       # @since 2.1.0
       attr_reader :_name
 
-      # Returns the scope's locals
+      # Returns the scope's locals.
+      #
+      # For a view's template and layout, this is a {Locals}, which resolves exposures lazily.
+      # For partials rendered with locals, this is a Hash.
       #
       # @overload _locals
       #   Returns the locals.
-      #   @return [Hash{Symbol => Object}]
+      #   @return [Locals, Hash{Symbol => Object}]
       # @overload locals
       #   A convenience alias for `#_locals.` Is available unless there is a local named `locals`
-      #   @return [Hash{Symbol => Object}]
+      #   @return [Locals, Hash{Symbol => Object}]
       #
       # @api public
       # @since 2.1.0
@@ -55,7 +58,7 @@ module Hanami
       # Returns a new Scope instance.
       #
       # @param name [Symbol, nil] scope name
-      # @param locals [Hash<Symbol, Object>] template locals
+      # @param locals [Locals, Hash<Symbol, Object>] template locals
       # @param rendering [Rendering] the current rendering
       #
       # @return [Scope]

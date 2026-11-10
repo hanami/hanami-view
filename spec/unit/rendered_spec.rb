@@ -39,6 +39,43 @@ RSpec.describe Hanami::View::Rendered do
     end
   end
 
+  describe "#==" do
+    it "is true for a Rendered with the same output, whatever its locals" do
+      other = described_class.new(output: "rendered template output", locals: {other: "locals"})
+
+      expect(rendered).to eq other
+    end
+
+    it "is false for a Rendered with different output" do
+      other = described_class.new(output: "other output", locals: {user: {name: "Jane"}})
+
+      expect(rendered).not_to eq other
+    end
+
+    it "compares against Strings, in either direction" do
+      expect(rendered).to eq "rendered template output"
+      expect("rendered template output").to eq rendered
+      expect(rendered).not_to eq "other output"
+    end
+
+    it "is false for other objects" do
+      expect(rendered).not_to eq Object.new
+    end
+  end
+
+  describe "#eql? and #hash" do
+    it "match a Rendered with the same output" do
+      other = described_class.new(output: "rendered template output", locals: {})
+
+      expect(rendered).to eql other
+      expect(rendered.hash).to eq other.hash
+    end
+
+    it "do not match Strings" do
+      expect(rendered).not_to eql "rendered template output"
+    end
+  end
+
   describe "#locals" do
     it "returns the locals hash" do
       expect(rendered.locals).to eql(user: {name: "Jane"})

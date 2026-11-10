@@ -96,6 +96,11 @@ module Hanami
       end
 
       # @api private
+      def eager?
+        options.fetch(:eager, false)
+      end
+
+      # @api private
       # @since 2.1.0
       def default_value
         options[:default]

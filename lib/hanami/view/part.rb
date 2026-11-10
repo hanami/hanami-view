@@ -61,12 +61,12 @@ module Hanami
       # Determines a part name (when initialized without one). Intended for internal use only while
       # unit testing Parts.
       #
-      # @return [String]
+      # @return [Symbol]
       #
       # @api private
       # @since 2.1.0
       def self.part_name(inflector)
-        name ? inflector.underscore(inflector.demodulize(name)) : "part"
+        (name ? inflector.underscore(inflector.demodulize(name)) : "part").to_sym
       end
 
       # Returns a new Part instance

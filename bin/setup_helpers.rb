@@ -8,12 +8,12 @@ module Setup
   def execute(cmd)
     puts "Running #{cmd}"
 
-    status, out, err = nil
+    status, _out, err = nil
 
     Open3.popen3(cmd) do |stdin, stdout, stderr, wait_thr|
       _pid = wait_thr.pid
       stdin.close
-      out = stdout.read
+      _out = stdout.read
       err = stderr.read
       status = wait_thr.value
     end
