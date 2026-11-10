@@ -260,8 +260,15 @@ module Hanami
     #   provided by Tilt; see Tilt's documentation for what options your
     #   template engine may support.
     #
-    #   Defaults to `{default_encoding: "utf-8"}`. Any options passed will be
-    #   merged onto the defaults.
+    #   Defaults to `{default_encoding: "utf-8"}`. Any options passed
+    #   will be merged onto the defaults.
+    #
+    #   ERB, Haml, and Slim templates may declare the locals they take with a magic comment,
+    #   such as `<%# locals: (user:, title: "Profile") %>` in ERB, `-# locals: (user:)` in Haml,
+    #   or `/# locals: (user:)` in Slim. Rendering the template then raises an `ArgumentError` for
+    #   a missing or unknown local, and fills in any defaults. Templates without the comment are
+    #   unaffected. Pass `extract_fixed_locals: false` to turn this off, or `true` to also use
+    #   Tilt's own extraction for other template engines.
     #
     #   @see https://github.com/jeremyevans/tilt
     #
