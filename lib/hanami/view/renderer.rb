@@ -14,10 +14,10 @@ module Hanami
     #   same relative path.
     # - **`@prefixes`** — a stack of subdirectories within each view path to search, mutated
     #   during rendering. It starts at `[CURRENT_PATH_PREFIX]` (the root itself). When a template is
-    #   rendered, its parent directory (e.g. `"users"` for `"users/index"`) is pushed onto the stack
-    #   so that a partial referenced by its bare name (e.g. `render("form")` from inside
-    #   `users/index.html.erb`) can be found alongside the template that renders it. The stack is
-    #   snapshot-and-restored around each render via `ensure`.
+    #   rendered, its parent directory (e.g. `"users"` for `"users/index"`) is pushed onto the stack,
+    #   or moved to its top if already there, so that a partial referenced by its bare name (e.g.
+    #   `render("form")` from inside `users/index.html.erb`) can be found alongside the template
+    #   that renders it. The stack is snapshot-and-restored around each render via `ensure`.
     #
     # `#lookup` tries every combination of a prefix and a path, joining each pair with the
     # requested name to find a matching file. `prefixes` are the outer loop, checked newest-first:
@@ -58,7 +58,7 @@ module Hanami
         template_path, relative_path = result
 
         new_prefix = File.dirname(relative_path)
-        @prefixes << new_prefix unless @prefixes.include?(new_prefix)
+        @prefixes = @prefixes - [new_prefix] + [new_prefix]
         @current_template_names = old_template_names + [resolve_template_name(relative_path)]
 
         render(template_path, scope, &yielded_block(block, old_template_names))

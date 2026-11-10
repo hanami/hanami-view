@@ -95,6 +95,16 @@ RSpec.describe "Template rendering / Partial lookup" do
       expect(build_view(template: "posts/show").call.to_s).to eq "posts[posts/_form]"
     end
 
+    it "prefers the directory of the template rendering it when the render chain returns there" do
+      write_template("posts", "_form.html.erb", "posts[<%= template_name %>]")
+      write_template("shared", "_form.html.erb", "shared[<%= template_name %>]")
+      write_template("posts", "_thing.html.erb", "<%= render('form') %>")
+      write_template("shared", "_card.html.erb", "<%= render('posts/thing') %>")
+      write_template("posts", "show.html.erb", "<%= render('shared/card') %>")
+
+      expect(build_view(template: "posts/show").call.to_s).to eq "posts[posts/_form]"
+    end
+
     it "prefers a deeper directory in a later view path over the root of an earlier one" do
       other_dir = make_tmp_directory
 
