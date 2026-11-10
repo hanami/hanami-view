@@ -38,9 +38,15 @@ module Hanami
         end
 
         def resolve_scope_class(name:, rendering:)
-          name = rendering.inflector.camelize(name.to_s)
-
           namespace = rendering.scope_namespace
+          unless namespace
+            raise UndefinedConfigError.new(
+              :scope_namespace,
+              "needed to find scope #{name.to_s.inspect}; set it, or pass the scope class itself"
+            )
+          end
+
+          name = rendering.inflector.camelize(name.to_s)
 
           # Give autoloaders a chance to act
           begin
