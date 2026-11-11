@@ -47,6 +47,31 @@ RSpec.describe Hanami::View do
     end
   end
 
+  describe "template caching" do
+    let(:view_class) { view.class }
+
+    it "reuses compiled templates across instances of the same view class" do
+      view_class.new.(context: context)
+
+      expect { view_class.new.(context: context) }
+        .not_to change { Hanami::View.cache.cache.size }
+    end
+
+    it "finalizes the config before sharing it" do
+      subclass = Class.new(view_class)
+
+      expect(subclass.config_data).to be(subclass.config_data)
+      expect(subclass.config).to be_frozen
+    end
+
+    it "keeps separate caches for subclasses" do
+      subclass = Class.new(view_class) { config.layout = "alternate" }
+
+      expect(subclass.new.(context: context).to_s).to include("Alternate layout")
+      expect(view_class.new.(context: context).to_s).not_to include("Alternate layout")
+    end
+  end
+
   describe "layout rendering" do
     subject(:view) {
       Class.new(Hanami::View) {

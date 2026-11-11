@@ -589,6 +589,16 @@ module Hanami
       Cache
     end
 
+    # Returns the finalized config as a data object, shared by every instance of the view class.
+    #
+    # The template lookup and compilation caches are keyed on this object, so instances must share
+    # it for a new instance to reuse the templates compiled for an earlier one.
+    #
+    # @api private
+    def self.config_data
+      @config_data ||= config.finalize!.to_data
+    end
+
     # Returns an instance of the view. This binds the defined exposures to the view instance.
     #
     # Subclasses can define their own `#initialize` to accept injected dependencies, but must call
@@ -602,7 +612,7 @@ module Hanami
       self.class.config.finalize!
       ensure_config
 
-      @config_data = config.to_data
+      @config_data = self.class.config_data
       @exposures = self.class.exposures.bind(self)
     end
 

@@ -35,6 +35,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 - Building a scope by name with no `scope_namespace` configured now raises `Hanami::View::UndefinedConfigError`, naming the scope and how to fix it. Previously this failed with `NoMethodError: undefined method 'const_defined?' for nil`. (@parndt in #293)
 - `token_list` (and its `class_names` alias) now removes duplicate tokens and excludes `false` values, as its documentation describes. Previously `token_list("foo", "foo bar")` returned `"foo foo bar"`, and `false` was included as the token `"false"`. (@parndt in #292)
 - Parts initialized without a `name:` now default to a Symbol name rather than a String. This means `part.render("partial")` makes the part available in the partial under its inferred name, rather than raising a `NameError`. (@parndt in #292)
+- Reuse compiled templates across instances of the same view class. Previously, each new view instance looked up and compiled its templates again, and the entries cached for earlier instances were never released. This affected any view instantiated more than once, such as views in a Hanami app's test environment. (@parndt)
 
 ### Security
 
