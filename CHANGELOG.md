@@ -25,6 +25,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 - `Rendered#==` now compares rendered string output only. It no longer compares locals. This is so that inspecting or comparing a `Rendered` does not resolve exposures that rendering skipped. To compare locals, compare `rendered.locals` directoy, e.g. `rendered.locals == {title: "Hi"}`, which resolves every exposure. (@timriley in #289)
 - Existing `locals:` magic comments, such as those kept from a Rails app, are now enforced. To keep the previous behavior, set `config.renderer_options = {extract_fixed_locals: false}`. (@parndt in #290)
 - Require Tilt 2.6 or later, the first version supporting fixed locals. (@parndt)
+- Reduce the overhead of rendering a template or partial by resolving its directory, name, and compiled template once per lookup instead of on every render. (@parndt)
 
 ### Deprecated
 

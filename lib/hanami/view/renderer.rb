@@ -38,6 +38,10 @@ module Hanami
       # Types of the named keyword parameters in a method's `#parameters`, required and optional.
       KEYWORD_PARAMETERS = %i[keyreq key].freeze
 
+      # A template found by `#lookup`: its absolute file path, the directory and name derived from
+      # its path relative to the matching view path, and its Tilt template.
+      FoundTemplate = Data.define(:path, :prefix, :name, :tilt_template)
+
       # Stack of resolved names for the templates and partials currently being rendered. The top of
       # the stack is the innermost render in progress.
       #
@@ -53,24 +57,22 @@ module Hanami
       end
 
       def template(name, format, scope, &block)
-        old_prefixes = @prefixes.dup
+        old_prefixes = @prefixes
         old_template_names = @current_template_names
         old_rendering_scopes = @rendering_scopes
 
-        result = lookup(name, format)
-        raise TemplateNotFoundError.new(name, format, config_data.paths) unless result
+        found = lookup(name, format)
+        raise TemplateNotFoundError.new(name, format, config_data.paths) unless found
 
-        template_path, relative_path = result
+        # `@prefixes` is replaced rather than mutated, since each array is also a lookup cache key.
+        @prefixes = @prefixes - [found.prefix] + [found.prefix] unless @prefixes.last == found.prefix
+        @current_template_names = old_template_names + [found.name]
 
-        new_prefix = File.dirname(relative_path)
-        @prefixes = @prefixes - [new_prefix] + [new_prefix]
-        @current_template_names = old_template_names + [resolve_template_name(relative_path)]
-
-        tilt_template = tilt(template_path)
+        tilt_template = found.tilt_template
         scope = scope_without_rendering_locals(scope) if tilt_template.fixed_locals?
         @rendering_scopes = old_rendering_scopes + [scope]
 
-        render(template_path, tilt_template, scope, &yielded_block(block, old_template_names))
+        render(found.path, tilt_template, scope, &yielded_block(block, old_template_names))
       ensure
         @prefixes = old_prefixes
         @current_template_names = old_template_names
@@ -97,12 +99,11 @@ module Hanami
       attr_reader :config_data, :prefixes
 
       # Searches `config.paths` (under each of the `prefixes`) for a template matching `name` and
-      # `format`. Returns the template's absolute file path (for rendering via Tilt) together with
-      # its path relative to the matching view path.
+      # `format`.
       #
       # Results are memoized via `View.cache` keyed on `(name, format, config_data, prefixes)`.
       #
-      # @return [[String, String], nil]
+      # @return [FoundTemplate, nil]
       def lookup(name, format)
         View.cache.fetch_or_store(:lookup, name, format, config_data.object_id, prefixes) {
           catch :found do
@@ -111,7 +112,12 @@ module Hanami
                 file_path = path.lookup(prefix, name, format)
                 if file_path
                   relative_path = Pathname.new(file_path).relative_path_from(path.dir).to_s
-                  throw :found, [file_path, relative_path]
+                  throw :found, FoundTemplate.new(
+                    path: file_path,
+                    prefix: File.dirname(relative_path),
+                    name: resolve_template_name(relative_path),
+                    tilt_template: tilt(file_path)
+                  )
                 end
               end
             end
@@ -168,9 +174,11 @@ module Hanami
       end
 
       def name_for_partial(name)
-        segments = name.to_s.split(PATH_DELIMITER)
-        segments[-1] = "#{PARTIAL_PREFIX}#{segments[-1]}"
-        segments.join(PATH_DELIMITER)
+        View.cache.fetch_or_store(:partial_name, name) {
+          segments = name.to_s.split(PATH_DELIMITER)
+          segments[-1] = "#{PARTIAL_PREFIX}#{segments[-1]}"
+          segments.join(PATH_DELIMITER).freeze
+        }
       end
 
       def render(path, template, scope, &block)

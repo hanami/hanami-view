@@ -40,6 +40,35 @@ RSpec.describe Hanami::View::Renderer do
         renderer.partial("missing_partial", :html, scope)
       }.to raise_error(Hanami::View::TemplateNotFoundError, /_missing_partial/)
     end
+
+    it "renders the same partial repeatedly" do
+      3.times do
+        expect(renderer.partial("shared/shared_hello", :html, scope)).to eql("<h1>Hello</h1>")
+      end
+    end
+
+    it "renders a partial named by a symbol" do
+      expect(renderer.partial(:hello, :html, scope)).to eql("<h1>Partial hello</h1>")
+    end
+
+    it "stops searching a partial's directory once it has rendered" do
+      renderer.partial("shared/shared_hello", :html, scope)
+
+      expect {
+        renderer.partial("shared_hello", :html, scope)
+      }.to raise_error(Hanami::View::TemplateNotFoundError, /_shared_hello/)
+    end
+
+    it "stops searching a partial's directory when rendering it raises" do
+      failing_scope = double(:scope)
+      allow(failing_scope).to receive(:_locals).and_raise("boom")
+
+      expect { renderer.partial("shared/shared_hello", :html, failing_scope) }.to raise_error("boom")
+
+      expect {
+        renderer.partial("shared_hello", :html, scope)
+      }.to raise_error(Hanami::View::TemplateNotFoundError, /_shared_hello/)
+    end
   end
 
   describe "#current_template_name" do
