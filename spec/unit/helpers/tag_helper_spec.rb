@@ -74,6 +74,23 @@ RSpec.describe Hanami::View::Helpers::TagHelper do
     end
 
     describe "tag attributes" do
+      it "leaves the given options unchanged" do
+        options = {class: ["a", {b: true}], data: {id: 1}, aria: {label: "x"}, hidden: true}
+        original = Marshal.load(Marshal.dump(options))
+
+        expect(tag.div("content", **options))
+          .to eq %(<div class="a b" data-id="1" aria-label="x" hidden="hidden">content</div>)
+        expect(options).to eq original
+      end
+
+      it "builds tag options and content tags from keywords" do
+        builder = described_class.tag
+
+        expect(builder.tag_options(id: "a", class: "b")).to eq %( id="a" class="b")
+        expect(builder.tag_options).to be_nil
+        expect(builder.content_tag_string("p", "hi", id: "a")).to eq %(<p id="a">hi</p>)
+      end
+
       it "does not include nil values" do
         expect(tag.p(ignored: nil)).to eq "<p></p>"
       end

@@ -107,16 +107,24 @@ module Hanami
             self_closing = SVG_SELF_CLOSING_ELEMENTS.include?(name)
 
             if (HTML_VOID_ELEMENTS.include?(name) || self_closing) && content.nil?
-              "<#{inflector.dasherize(name.to_s)}#{tag_options(**options)}#{self_closing ? " />" : ">"}".html_safe
+              "<#{inflector.dasherize(name.to_s)}#{build_tag_options(options)}#{self_closing ? " />" : ">"}".html_safe
             else
-              content_tag_string(inflector.dasherize(name.to_s), content || "", **options)
+              build_content_tag_string(inflector.dasherize(name.to_s), content || "", options)
             end
           end
 
           # @api private
           # @since 2.1.0
           def content_tag_string(name, content, **options)
-            tag_options = tag_options(**options) unless options.empty?
+            build_content_tag_string(name, content, options)
+          end
+
+          # Builds a content tag from options given as a hash rather than as keywords, which would
+          # copy the hash at each level of the call.
+          #
+          # @api private
+          def build_content_tag_string(name, content, options)
+            tag_options = build_tag_options(options) unless options.empty?
 
             name = EscapeHelper.escape_xml_name(name)
             content = EscapeHelper.escape_html(content)
@@ -129,7 +137,14 @@ module Hanami
           # @api private
           # @since 2.1.0
           def tag_options(**options)
-            return if options.none?
+            build_tag_options(options)
+          end
+
+          # Builds tag options from a hash. See {#build_content_tag_string}.
+          #
+          # @api private
+          def build_tag_options(options)
+            return if options.empty?
 
             output = +""
 
@@ -189,7 +204,7 @@ module Hanami
 
             case value
             when Array, Hash
-              value = TagHelper.build_tag_values(value) if key.to_s == "class"
+              value = TagHelper.build_tag_values(value) if key == "class"
               value = EscapeHelper.escape_join(value, " ")
             when Regexp
               value = EscapeHelper.escape_html(value.source)
