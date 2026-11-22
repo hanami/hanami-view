@@ -35,6 +35,7 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 - Building a scope by name with no `scope_namespace` configured now raises `Hanami::View::UndefinedConfigError`, naming the scope and how to fix it. Previously this failed with `NoMethodError: undefined method 'const_defined?' for nil`. (@parndt in #293)
 - `token_list` (and its `class_names` alias) now removes duplicate tokens and excludes `false` values, as its documentation describes. Previously `token_list("foo", "foo bar")` returned `"foo foo bar"`, and `false` was included as the token `"false"`. (@parndt in #292)
 - Parts initialized without a `name:` now default to a Symbol name rather than a String. This means `part.render("partial")` makes the part available in the partial under its inferred name, rather than raising a `NameError`. (@parndt in #292)
+- `String#html_safe` defers to Active Support's implementation when Active Support is loaded, returning an `ActiveSupport::SafeBuffer`. This fixes Hanami View inside Rails apps, where it previously broke Rails and Rails-targeted gems. Hanami View also no longer causes "method redefined" warnings for `Object#html_safe?` and `Numeric#html_safe?` when used with Active Support. (@timriley in #294)
 
 ### Security
 

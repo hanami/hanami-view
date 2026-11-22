@@ -34,6 +34,9 @@ group :test do
   gem "hanami-devtools", github: "hanami/devtools", branch: "main"
   gem "rack", ">= 2.0.6"
   gem "slim", "~> 5.0"
+
+  # For Active Support compatibility specs
+  gem "activesupport"
 end
 
 group :benchmarks do
