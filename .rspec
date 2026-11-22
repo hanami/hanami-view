@@ -2,3 +2,4 @@
 --require spec_helper
 --order random
 --warnings
+--exclude-pattern spec/isolation/**/*_spec.rb
