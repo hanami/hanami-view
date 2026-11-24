@@ -60,4 +60,21 @@ RSpec.describe Hanami::View::Helpers::EscapeHelper, ".sanitize_url" do
       expect(sanitize_url("http://x.xx/@%22style=%22color:pink%22onmouseover=alert(1)//")).to eq "http://x.xx/@"
     end
   end
+
+  describe "attribute-breaking characters in an otherwise permitted URL" do
+    it "percent-encodes a single quote decoded from the input" do
+      result = sanitize_url("http://x/%27onmouseover=%27alert(1)")
+
+      expect(result).to be_html_safe
+      expect(result).not_to include "'"
+      expect(result).to eq "http://x/%27onmouseover=%27alert(1)"
+    end
+
+    it "percent-encodes a literal single quote" do
+      result = sanitize_url("http://x/'onmouseover='alert(1)")
+
+      expect(result).to be_html_safe
+      expect(result).not_to include "'"
+    end
+  end
 end

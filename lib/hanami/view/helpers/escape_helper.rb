@@ -120,11 +120,18 @@ module Hanami
         def sanitize_url(input, permitted_schemes = PERMITTED_URL_SCHEMES)
           return input if input.html_safe?
 
-          URI_PARSER.extract(
+          url = URI_PARSER.extract(
             URI.decode_www_form_component(input.to_s),
             permitted_schemes
-          ).first.to_s.html_safe
+          ).first.to_s
+
+          # Percent-encode characters that can end an HTML attribute. None of them may appear
+          # unencoded in a valid URI, so well-formed URLs are unchanged.
+          url.gsub(UNSAFE_URL_CHARS) { |char| format("%%%02X", char.ord) }.html_safe
         end
+
+        UNSAFE_URL_CHARS = /['"`<> ]/
+        private_constant :UNSAFE_URL_CHARS
 
         # Use the RFC2396_PARSER if available. Modern Rubies should have RFC2396_PARSER available.
         # Otherwise, fall back to the DEFAULT_PARSER (which may still raise deprecation warnings).
