@@ -19,6 +19,8 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Security
 
+- Percent-encode quotes, backticks, angle brackets and spaces in the result of `sanitize_url`. Previously a decoded `'` was returned as-is in an HTML-safe string, breaking out of single-quoted attributes. (@parndt in GHSA-4g74-pv6p-g8hw)
+
 [Unreleased]: https://github.com/hanami/view/compare/v3.0.2...HEAD
 
 ## [3.0.2] - 2026-08-21
