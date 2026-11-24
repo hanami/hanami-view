@@ -2,8 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Break Versioning](https://www.taoensso.com/break-versioning).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Break Versioning](https://www.taoensso.com/break-versioning).
 
 ## [Unreleased]
 
@@ -19,9 +18,15 @@ and this project adheres to [Break Versioning](https://www.taoensso.com/break-ve
 
 ### Security
 
+[Unreleased]: https://github.com/hanami/view/compare/v3.0.3...HEAD
+
+## [3.0.3] - 2026-11-24
+
+### Security
+
 - Percent-encode quotes, backticks, angle brackets and spaces in the result of `sanitize_url`. Previously a decoded `'` was returned as-is in an HTML-safe string, breaking out of single-quoted attributes. (@parndt in GHSA-4g74-pv6p-g8hw)
 
-[Unreleased]: https://github.com/hanami/view/compare/v3.0.2...HEAD
+[3.0.3]: https://github.com/hanami/view/compare/v3.0.2...v3.0.3
 
 ## [3.0.2] - 2026-08-21
 
